@@ -28,6 +28,8 @@ export function Navbar() {
                 width={48}
                 height={48}
                 className="w-full h-full object-contain"
+                loading="eager"
+                priority
               />
             </div>
             <span className="text-lg font-semibold tracking-wide text-foreground hidden sm:block group-hover:text-primary transition-colors">
