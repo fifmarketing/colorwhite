@@ -87,10 +87,9 @@ export default function Home() {
             <div className="space-y-8 order-1">
               <div className="space-y-6">
                 <h1 className="text-5xl md:text-6xl font-bold text-foreground leading-tight text-balance">
-                  Reveal Your Natural Glow
-                </h1>
+Color White Beauty Cream                </h1>
                 <p className="text-lg font-light text-foreground/80 leading-relaxed max-w-md">
-                  Color White Beauty Cream helps brighten, hydrate, and nourish your skin for a flawless look.
+                 Color White Beauty Cream is a skin brightening cream that helps to reduce dark spots and uneven skin tone. Infused with natural avocado and milk, it nourishes and moisturizes the skin for a radiant complexion.
                 </p>
               </div>
 
@@ -108,30 +107,18 @@ export default function Home() {
             </div>
 
             {/* Right: Product Image */}
-            <div className="order-2 relative">
-              <div className="relative aspect-square rounded-3xl overflow-hidden shadow-2xl transform hover:scale-105 transition-all duration-500">
+            <div className="order-2 flex justify-center">
+              <div className="relative w-full max-w-md h-96">
                 <Image
                   src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/hero-img-1536x1014-ZoR28h1lFA7WAMjnneCtf3bq8JUVu4.png"
                   alt="Color White Beauty Cream - Product and Woman"
                   fill
-                  className="object-cover"
+                  className="object-contain"
                   priority
                 />
-                {/* Soft shadow effect around image */}
-                <div className="absolute inset-0 rounded-3xl shadow-inset pointer-events-none" style={{boxShadow: 'inset 0 0 40px rgba(0,0,0,0.1)'}}></div>
               </div>
-              {/* Floating effect animation */}
-              <style>{`
-                @keyframes floatImage {
-                  0%, 100% { transform: translateY(0px) translateZ(0); }
-                  50% { transform: translateY(-20px) translateZ(0); }
-                }
-                .animate-float {
-                  animation: floatImage 6s ease-in-out infinite;
-                }
-              `}</style>
-              <div className="absolute inset-0 rounded-3xl shadow-2xl animate-float pointer-events-none" style={{animation: 'floatImage 6s ease-in-out infinite'}}></div>
             </div>
+
           </div>
         </div>
       </section>
