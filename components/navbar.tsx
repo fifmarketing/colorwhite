@@ -4,9 +4,12 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useState } from 'react'
 import { Menu, X, ShoppingCart } from 'lucide-react'
+import { useCart } from '@/context/CartContext'
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
+  const { getItemCount } = useCart()
+  const itemCount = getItemCount()
 
   const navLinks = [
     { href: '/', label: 'Home' },
@@ -53,12 +56,14 @@ export function Navbar() {
 
           {/* Right side items */}
           <div className="flex items-center gap-4">
-            <button className="p-2 hover:bg-secondary rounded-full transition-all duration-300 ease-out relative">
-              <ShoppingCart className="w-5 h-5 text-foreground" />
-              <span className="absolute top-1 right-1 w-4 h-4 bg-primary text-primary-foreground text-xs rounded-full flex items-center justify-center">
-                0
-              </span>
-            </button>
+            <Link href="/cart" className="p-2 hover:bg-secondary rounded-full transition-all duration-300 ease-out relative group">
+              <ShoppingCart className="w-5 h-5 text-foreground group-hover:text-primary transition-colors" />
+              {itemCount > 0 && (
+                <span className="absolute top-1 right-1 w-5 h-5 bg-primary text-primary-foreground text-xs rounded-full flex items-center justify-center font-semibold animate-pulse">
+                  {itemCount}
+                </span>
+              )}
+            </Link>
 
             {/* Mobile menu button */}
             <button
