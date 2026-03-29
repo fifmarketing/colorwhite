@@ -98,7 +98,7 @@ export default function CartPage() {
                     </h3>
                     <div className="flex items-center gap-3">
                       <p className="text-xl font-light text-primary">
-                        Rs. {item.price.toLocaleString()}
+                        Rs. {(item.price ?? 0).toLocaleString()}
                       </p>
                       <p className="text-xs font-light text-foreground/60 px-3 py-1 rounded-full bg-primary/5">
                         Premium Quality
@@ -140,7 +140,7 @@ export default function CartPage() {
                     Subtotal
                   </span>
                   <p className="text-3xl font-light text-primary mt-4">
-                    Rs. {(item.price * item.quantity).toLocaleString()}
+                    Rs. {((item.price ?? 0) * item.quantity).toLocaleString()}
                   </p>
                 </div>
               </div>
