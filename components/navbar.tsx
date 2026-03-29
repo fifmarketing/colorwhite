@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { useState } from 'react'
-import { Menu, X, ShoppingCart } from 'lucide-react'
+import { Menu, X, ShoppingCart, Mail, Facebook, Instagram, Twitter } from 'lucide-react'
 import { useCart } from '@/context/CartContext'
 
 export function Navbar() {
@@ -19,7 +19,45 @@ export function Navbar() {
   ]
 
   return (
-    <nav className="sticky top-0 z-50 bg-background/95 backdrop-blur-md border-b border-border shadow-luxury-sm">
+    <>
+      {/* Top Header */}
+      <div className="bg-primary text-primary-foreground">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col sm:flex-row justify-between items-center py-3 gap-3 sm:gap-0">
+          
+              <div className="flex items-center gap-4">
+              <a href="#" className="text-primary-foreground hover:opacity-80 transition-opacity">
+                <Facebook className="w-4 h-4" />
+              </a>
+              <a href="#" className="text-primary-foreground hover:opacity-80 transition-opacity">
+                <Instagram className="w-4 h-4" />
+              </a>
+              <a href="#" className="text-primary-foreground hover:opacity-80 transition-opacity">
+                <Twitter className="w-4 h-4" />
+              </a>
+            </div>
+            {/* Center: Email */}
+          
+              {/* Left: Shipping promo */}
+            <div className="text-sm font-light tracking-wide">
+              Free Shipping on orders above Rs. 2000 –{' '}
+              <Link href="/shop" className="font-semibold hover:underline">
+                Shop Now!
+              </Link>
+            </div>
+            {/* Right: Social Links */}
+            <div className="flex items-center gap-2 text-sm font-light tracking-wide">
+              <Mail className="w-4 h-4" />
+              <a href="mailto:colorwhitecosmetics@gmail.com" className="hover:underline">
+                colorwhitecosmetics@gmail.com
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Navigation */}
+      <nav className="sticky top-0 z-50 bg-background/95 backdrop-blur-md border-b border-border shadow-luxury-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-20">
           {/* Logo */}
@@ -98,5 +136,6 @@ export function Navbar() {
         )}
       </div>
     </nav>
+    </>
   )
 }

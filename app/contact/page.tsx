@@ -279,45 +279,7 @@ export default function Contact() {
         </div>
       </section>
 
-      {/* FAQ Section */}
-      <section className="py-24 bg-secondary/30">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-light tracking-tight text-foreground mb-4">
-              Frequently Asked Questions
-            </h2>
-            <p className="text-lg font-light text-foreground/70">
-              Quick answers to common questions
-            </p>
-          </div>
-
-          <div className="space-y-4">
-            {[
-              {
-                q: 'What is your return policy?',
-                a: 'We offer a 30-day money-back guarantee on all products. If you&apos;re not satisfied, simply contact us for a full refund.',
-              },
-              {
-                q: 'How long does shipping take?',
-                a: 'Standard shipping takes 3-5 business days. Express shipping is available for 1-2 business day delivery.',
-              },
-              {
-                q: 'Are your products suitable for all skin types?',
-                a: 'Yes, our products are formulated to work with all skin types. However, we recommend starting with a patch test.',
-              },
-              {
-                q: 'Do you offer international shipping?',
-                a: 'Currently, we ship within Pakistan. International shipping options coming soon!',
-              },
-            ].map((faq, i) => (
-              <div key={i} className="bg-card rounded-2xl p-6 shadow-luxury-sm hover-lift hover:shadow-xl transition-all duration-300">
-                <h3 className="font-light text-foreground mb-2 text-lg">{faq.q}</h3>
-                <p className="text-foreground/70 font-light text-sm leading-relaxed">{faq.a}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+  
 
       <Footer />
       <Toaster />

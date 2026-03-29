@@ -47,32 +47,6 @@ export default function Shop() {
         </div>
       </section>
 
-      {/* Newsletter */}
-      <section className="py-20 bg-secondary/30">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-8">
-          <div className="space-y-4">
-            <h2 className="text-4xl md:text-5xl font-light tracking-tight text-foreground">
-              Subscribe for Exclusive Offers
-            </h2>
-            <p className="text-lg font-light text-foreground/70">
-              Join our community and receive 15% off your first order, plus insider tips and new product launches.
-            </p>
-          </div>
-          <form className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
-            <input
-              type="email"
-              placeholder="Enter your email"
-              className="flex-1 px-6 py-3 rounded-full bg-card border border-border font-light outline-none focus:ring-2 focus:ring-primary transition-all duration-300 ease-out"
-            />
-            <button
-              type="submit"
-              className="bg-primary text-primary-foreground px-8 py-3 rounded-full font-light tracking-wide hover:shadow-2xl transition-all duration-300 ease-out"
-            >
-              Subscribe
-            </button>
-          </form>
-        </div>
-      </section>
 
       <Footer />
     </main>
