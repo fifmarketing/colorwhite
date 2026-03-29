@@ -147,18 +147,7 @@ export default function Contact() {
                   </div>
                 </div>
 
-                {/* WhatsApp */}
-                <div className="flex gap-6 group cursor-pointer">
-                  <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center flex-shrink-0 group-hover:bg-primary/20 group-hover:scale-110 transition-all duration-300 ease-out">
-                    <MessageCircle className="w-7 h-7 text-primary" />
-                  </div>
-                  <div className="flex flex-col justify-center">
-                    <p className="font-light text-foreground text-lg mb-1">WhatsApp</p>
-                    <a href="https://wa.me/923001234567" className="text-foreground/70 font-light hover:text-primary transition-all duration-300 ease-out" target="_blank" rel="noopener noreferrer">
-                      Chat with us
-                    </a>
-                  </div>
-                </div>
+              
 
                 {/* Address */}
                 <div className="flex gap-6 group cursor-pointer">
