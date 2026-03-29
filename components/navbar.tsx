@@ -56,6 +56,8 @@ export function Navbar() {
 
           {/* Right side items */}
           <div className="flex items-center gap-4">
+        
+            
             <Link href="/cart" className="p-2 hover:bg-secondary rounded-full transition-all duration-300 ease-out relative group">
               <ShoppingCart className="w-5 h-5 text-foreground group-hover:text-primary transition-colors" />
               {itemCount > 0 && (
