@@ -11,7 +11,7 @@ export function WhatsAppButton() {
       href={whatsappUrl}
       target="_blank"
       rel="noopener noreferrer"
-      className="fixed bottom-6 right-6 z-40 group cursor-pointer"
+      className="fixed bottom-6 left-6 z-40 group cursor-pointer"
       aria-label="Chat with us on WhatsApp"
     >
       {/* Button */}
@@ -23,10 +23,7 @@ export function WhatsAppButton() {
         <MessageCircle className="w-6 h-6 sm:w-7 sm:h-7 text-white relative z-10" />
       </div>
 
-      {/* Tooltip on hover */}
-      <div className="absolute bottom-full right-0 mb-3 bg-gray-900 text-white text-xs sm:text-sm px-3 py-2 rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none shadow-lg">
-        Message us on WhatsApp
-      </div>
+    
     </a>
   )
 }

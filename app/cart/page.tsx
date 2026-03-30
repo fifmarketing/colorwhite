@@ -2,7 +2,6 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { useState } from 'react'
 import { Navbar } from '@/components/navbar'
 import { Footer } from '@/components/footer'
 import { useCart } from '@/context/CartContext'
@@ -20,22 +19,22 @@ export default function CartPage() {
     return (
       <main className="min-h-screen bg-gradient-to-b from-secondary via-background to-background">
         <Navbar />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32 flex items-center justify-center">
-          <div className="text-center space-y-8 max-w-2xl">
-            <div className="inline-block p-6 rounded-3xl bg-primary/10">
-              <ShoppingBag className="w-16 h-16 text-primary mx-auto" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-32 flex items-center justify-center">
+          <div className="text-center space-y-6 sm:space-y-8 max-w-2xl">
+            <div className="inline-block p-5 sm:p-6 rounded-3xl bg-primary/10">
+              <ShoppingBag className="w-12 h-12 sm:w-16 sm:h-16 text-primary mx-auto" />
             </div>
-            <div className="space-y-4">
-              <h1 className="text-5xl md:text-6xl font-light text-foreground text-balance">
+            <div className="space-y-3 sm:space-y-4">
+              <h1 className="text-3xl sm:text-5xl md:text-6xl font-light text-foreground">
                 Your Cart is Empty
               </h1>
-              <p className="text-lg font-light text-foreground/70 max-w-2xl mx-auto leading-relaxed">
-                Discover our luxurious skincare collection and add your favorite premium beauty products to your cart.
+              <p className="text-sm sm:text-lg font-light text-foreground/70 leading-relaxed">
+                Discover our luxurious skincare collection and add your favorite products to your cart.
               </p>
             </div>
-            <Link href="/shop" className="inline-flex items-center gap-3 bg-gradient-to-r from-primary to-primary/90 text-primary-foreground px-8 py-4 rounded-full font-light tracking-wide hover:shadow-2xl hover:shadow-primary/40 transition-all duration-300 ease-out transform hover:scale-105 group cursor-pointer">
+            <Link href="/shop" className="inline-flex items-center gap-2 sm:gap-3 bg-primary text-primary-foreground px-6 sm:px-8 py-3 sm:py-4 rounded-full text-sm sm:text-base hover:shadow-xl transition">
               Continue Shopping
-              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
             </Link>
           </div>
         </div>
@@ -48,98 +47,72 @@ export default function CartPage() {
     <main className="min-h-screen bg-gradient-to-b from-secondary via-background to-background">
       <Navbar />
 
-      {/* Cart Section */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-20">
+        
         {/* Header */}
-        <div className="mb-16">
-          <div className="inline-block px-4 py-2 bg-primary/10 rounded-full mb-4">
-            <p className="text-sm font-light text-primary flex items-center gap-2">
-              <Sparkles className="w-4 h-4" />
+        <div className="mb-10 sm:mb-16">
+          <div className="inline-block px-3 py-1 sm:px-4 sm:py-2 bg-primary/10 rounded-full mb-3 sm:mb-4">
+            <p className="text-xs sm:text-sm text-primary flex items-center gap-2">
+              <Sparkles className="w-3 h-3 sm:w-4 sm:h-4" />
               Shopping Cart
             </p>
           </div>
-          <h1 className="text-5xl md:text-6xl font-light text-foreground text-balance mb-4">
+          <h1 className="text-3xl sm:text-5xl md:text-6xl font-light text-foreground mb-2 sm:mb-4">
             Your Luxury Items
           </h1>
-          <p className="text-lg font-light text-foreground/60">
+          <p className="text-sm sm:text-lg text-foreground/60">
             {items.length} {items.length === 1 ? 'product' : 'products'} in your cart
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
+          
           {/* Cart Items */}
-          <div className="lg:col-span-2 space-y-6 order-1 lg:order-1">
-            {items.map((item, index) => (
+          <div className="lg:col-span-2 space-y-4 sm:space-y-6">
+            {items.map((item) => (
               <div
                 key={item.id}
-                className="group flex gap-6 p-6 rounded-2xl bg-white/50 backdrop-blur-sm border border-primary/10 hover:border-primary/30 shadow-lg hover:shadow-2xl hover:shadow-primary/20 transition-all duration-300 animate-in fade-in slide-in-from-left-4"
-                style={{ animationDelay: `${index * 100}ms` }}
+                className="flex flex-col sm:flex-row gap-4 sm:gap-6 p-4 sm:p-6 rounded-2xl bg-white/50 border border-primary/10 shadow-lg"
               >
-                {/* Product Image */}
-                <div className="relative w-32 h-32 flex-shrink-0 rounded-2xl overflow-hidden bg-gradient-to-br from-secondary to-primary/5 ring-2 ring-primary/20 group-hover:ring-primary/40 transition-all duration-300">
-                  <Image
-                    src={item.image}
-                    alt={item.name}
-                    fill
-                    className="object-cover group-hover:scale-110 transition-transform duration-500"
-                  />
+                {/* Image */}
+                <div className="relative w-full sm:w-32 h-40 sm:h-32 rounded-xl overflow-hidden">
+                  <Image src={item.image} alt={item.name} fill className="object-cover" />
                 </div>
 
-                {/* Product Details */}
+                {/* Details */}
                 <div className="flex-grow flex flex-col justify-between">
                   <div>
-                    {item.category && (
-                      <p className="text-xs font-light tracking-widest uppercase text-primary/70 mb-2">
-                        {item.category}
-                      </p>
-                    )}
-                    <h3 className="text-lg font-light text-foreground mb-2 group-hover:text-primary transition-colors">
+                    <h3 className="text-base sm:text-lg text-foreground">
                       {item.name}
                     </h3>
-                    <div className="flex items-center gap-3">
-                      <p className="text-xl font-light text-primary">
-                        Rs. {(item.price ?? 0).toLocaleString()}
-                      </p>
-                      <p className="text-xs font-light text-foreground/60 px-3 py-1 rounded-full bg-primary/5">
-                        Premium Quality
-                      </p>
-                    </div>
+                    <p className="text-primary text-lg sm:text-xl">
+                      Rs. {(item.price ?? 0).toLocaleString()}
+                    </p>
                   </div>
 
-                  {/* Quantity and Action */}
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3 bg-gradient-to-r from-primary/10 to-primary/5 rounded-xl p-2 border border-primary/20">
-                      <button
-                        onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                        className="p-2 hover:bg-primary/20 rounded-lg transition-all duration-300 hover:scale-110 cursor-pointer"
-                      >
-                        <Minus className="w-4 h-4 text-primary" />
+                  <div className="flex items-center justify-between mt-3">
+                    <div className="flex items-center gap-2 bg-primary/10 rounded-lg p-1">
+                      <button onClick={() => updateQuantity(item.id, item.quantity - 1)}>
+                        <Minus className="w-4 h-4" />
                       </button>
-                      <span className="w-8 text-center font-light text-foreground font-semibold">
+                      <span className="w-6 text-center text-sm">
                         {item.quantity}
                       </span>
-                      <button
-                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                        className="p-2 hover:bg-primary/20 rounded-lg transition-all duration-300 hover:scale-110 cursor-pointer"
-                      >
-                        <Plus className="w-4 h-4 text-primary" />
+                      <button onClick={() => updateQuantity(item.id, item.quantity + 1)}>
+                        <Plus className="w-4 h-4" />
                       </button>
                     </div>
-                    <button
-                      onClick={() => removeFromCart(item.id)}
-                      className="p-3 text-destructive/70 hover:text-destructive hover:bg-destructive/10 rounded-lg transition-all duration-300 transform hover:scale-110 cursor-pointer"
-                    >
-                      <Trash2 className="w-5 h-5" />
+
+                    <button onClick={() => removeFromCart(item.id)}>
+                      <Trash2 className="w-5 h-5 text-destructive" />
                     </button>
                   </div>
                 </div>
 
-                {/* Total Price */}
-                <div className="flex-shrink-0 text-right flex flex-col justify-between items-end">
-                  <span className="text-xs font-light text-foreground/60 uppercase tracking-wide">
-                    Subtotal
-                  </span>
-                  <p className="text-3xl font-light text-primary mt-4">
+                {/* Subtotal */}
+                <div className="text-right">
+                  <p className="text-xs text-foreground/60">Subtotal</p>
+                  <p className="text-lg sm:text-2xl text-primary">
                     Rs. {((item.price ?? 0) * item.quantity).toLocaleString()}
                   </p>
                 </div>
@@ -147,63 +120,41 @@ export default function CartPage() {
             ))}
           </div>
 
-          {/* Order Summary Sidebar */}
-          <div className="lg:col-span-1 order-2 lg:order-2">
-            <div className="sticky top-24 space-y-6 lg:space-y-6">
-              {/* Main Summary Card */}
-              <div className="p-6 md:p-8 rounded-2xl md:rounded-3xl bg-gradient-to-b from-primary/5 to-primary/2 border border-primary/20 shadow-2xl shadow-primary/10 backdrop-blur-sm">
-                <h2 className="text-xl md:text-2xl font-light text-foreground mb-6 md:mb-8 text-balance">
-                  Order Summary
-                </h2>
+          {/* Summary */}
+          <div>
+            <div className="sticky top-24 p-4 sm:p-6 rounded-2xl bg-primary/5 border border-primary/20">
+              <h2 className="text-lg sm:text-xl mb-4">Order Summary</h2>
 
-                <div className="space-y-3 md:space-y-4 mb-6 pb-6 border-b border-primary/20">
-                  <div className="flex justify-between items-center">
-                    <span className="font-light text-sm md:text-base text-foreground/70">Subtotal</span>
-                    <span className="font-light text-sm md:text-base text-foreground">
-                      Rs. {subtotal.toLocaleString()}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="font-light text-sm md:text-base text-foreground/70">Shipping</span>
-                    <span className="font-light text-sm md:text-base text-foreground">
-                      Rs. {shipping.toLocaleString()}
-                    </span>
-                  </div>
-                  {savings > 0 && (
-                    <div className="flex justify-between items-center pt-2 border-t border-primary/10">
-                      <span className="font-light text-sm md:text-base text-foreground/70">Savings</span>
-                      <span className="font-light text-sm md:text-base text-green-600">
-                        -Rs. {savings.toLocaleString()}
-                      </span>
-                    </div>
-                  )}
+              <div className="space-y-2 sm:space-y-3 mb-4 border-b pb-4">
+                <div className="flex justify-between text-sm sm:text-base">
+                  <span>Subtotal</span>
+                  <span>Rs. {subtotal.toLocaleString()}</span>
                 </div>
-
-                <div className="flex justify-between items-center mb-6 md:mb-8 p-3 md:p-4 rounded-lg md:rounded-xl bg-gradient-to-r from-primary/20 to-primary/10 border border-primary/30">
-                  <span className="text-base md:text-lg font-light text-foreground">Total</span>
-                  <span className="text-2xl md:text-3xl font-light text-primary">
-                    Rs. {total.toLocaleString()}
-                  </span>
+                <div className="flex justify-between text-sm sm:text-base">
+                  <span>Shipping</span>
+                  <span>Rs. {shipping.toLocaleString()}</span>
                 </div>
-
-                <Link
-                  href="/checkout"
-                  className="w-full bg-gradient-to-r from-primary to-primary/90 text-primary-foreground py-3 md:py-4 rounded-lg md:rounded-xl font-light text-center text-sm md:text-base tracking-wide hover:shadow-2xl hover:shadow-primary/40 transition-all duration-300 ease-out transform hover:scale-105 active:scale-95 flex items-center justify-center gap-2 group relative overflow-hidden cursor-pointer"
-                >
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent transform -skew-x-12 group-hover:translate-x-full transition-transform duration-500"></div>
-                  Proceed to Checkout
-                  <ArrowRight className="w-4 md:w-5 h-4 md:h-5 group-hover:translate-x-1 transition-transform" />
-                </Link>
-
-               
+                {savings > 0 && (
+                  <div className="flex justify-between text-green-600 text-sm sm:text-base">
+                    <span>Savings</span>
+                    <span>-Rs. {savings.toLocaleString()}</span>
+                  </div>
+                )}
               </div>
 
-              {/* Trust Badge */}
-              <div className="p-4 md:p-6 rounded-xl md:rounded-2xl bg-white/30 backdrop-blur-sm border border-primary/10 text-center hidden md:block">
-                <p className="text-xs font-light text-foreground/70 leading-relaxed">
-                  ✓ Secure Payment  •  ✓ Fast Delivery  •  ✓ Easy Returns
-                </p>
+              <div className="flex justify-between mb-4 text-base sm:text-lg">
+                <span>Total</span>
+                <span className="text-primary font-semibold">
+                  Rs. {total.toLocaleString()}
+                </span>
               </div>
+
+              <Link
+                href="/checkout"
+                className="block w-full text-center bg-primary text-primary-foreground py-3 rounded-lg text-sm sm:text-base"
+              >
+                Proceed to Checkout
+              </Link>
             </div>
           </div>
         </div>
