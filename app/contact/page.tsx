@@ -128,8 +128,8 @@ export default function Contact() {
                   </div>
                   <div className="flex flex-col justify-center">
                     <p className="font-light text-foreground text-lg mb-1">Email</p>
-                    <a href="mailto:colorwhitecosmetics@gmail.com" className="text-foreground/70 font-light hover:text-primary transition-all duration-300 ease-out cursor-pointer">
-                      colorwhitecosmetics@gmail.com
+                    <a href="mailto:Sm9626157@gmail.com" className="text-foreground/70 font-light hover:text-primary transition-all duration-300 ease-out cursor-pointer">
+                      Sm9626157@gmail.com
                     </a>
                   </div>
                 </div>
@@ -141,8 +141,8 @@ export default function Contact() {
                   </div>
                   <div className="flex flex-col justify-center">
                     <p className="font-light text-foreground text-lg mb-1">Phone</p>
-                    <a href="tel:+923296512101" className="text-foreground/70 font-light hover:text-primary transition-all duration-300 ease-out cursor-pointer">
-                      +92 329 651 2101
+                    <a href="tel:+923007222669" className="text-foreground/70 font-light hover:text-primary transition-all duration-300 ease-out cursor-pointer">
+                      +92 300 7222669
                     </a>
                   </div>
                 </div>
@@ -157,7 +157,7 @@ export default function Contact() {
                   <div className="flex flex-col justify-center">
                     <p className="font-light text-foreground text-lg mb-1">Address</p>
                     <p className="text-foreground/70 font-light">
-                      Karachi, Pakistan
+                     10-H Afghani Road, Samanabad, Lahore, 54000, Punjab, Pakistan
                     </p>
                   </div>
                 </div>

@@ -26,15 +26,13 @@ export function Navbar() {
           <div className="flex flex-col sm:flex-row justify-between items-center py-3 gap-3 sm:gap-0">
           
               <div className="flex items-center gap-4">
-              <a href="https://www.facebook.com/" target="_blank" rel="noopener noreferrer" className="text-primary-foreground hover:opacity-80 transition-opacity cursor-pointer">
+              <a href="https://web.facebook.com/ColorWhiteBeautyCream" target="_blank" rel="noopener noreferrer" className="text-primary-foreground hover:opacity-80 transition-opacity cursor-pointer">
                 <Facebook className="w-4 h-4" />
               </a>
-              <a href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer" className="text-primary-foreground hover:opacity-80 transition-opacity cursor-pointer">
+              <a href="https://www.instagram.com/colorwhitecosmetics/" target="_blank" rel="noopener noreferrer" className="text-primary-foreground hover:opacity-80 transition-opacity cursor-pointer">
                 <Instagram className="w-4 h-4" />
               </a>
-              <a href="https://www.twitter.com/" target="_blank" rel="noopener noreferrer" className="text-primary-foreground hover:opacity-80 transition-opacity cursor-pointer">
-                <Twitter className="w-4 h-4" />
-              </a>
+      
             </div>
             {/* Center: Email */}
           
