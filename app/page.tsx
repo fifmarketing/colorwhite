@@ -117,9 +117,9 @@ Color White Beauty Cream                </h1>
                 </p>
               </div>
 
-              <button className="bg-primary text-white px-10 py-4 rounded-full font-semibold hover:bg-opacity-90 transition-all duration-300 ease-out transform hover:scale-105 active:scale-95 shadow-lg hover:shadow-xl">
+              <a href="/shop" className="inline-block bg-primary text-white px-10 py-4 rounded-full font-semibold hover:bg-opacity-90 transition-all duration-300 ease-out transform hover:scale-105 active:scale-95 shadow-lg hover:shadow-xl cursor-pointer">
                 Shop Now
-              </button>
+              </a>
 
               {/* Floating animation effect */}
               <style>{`
@@ -202,10 +202,10 @@ Color White Beauty Cream                </h1>
           <p className="text-lg font-light text-foreground/70 max-w-2xl mx-auto">
             Join thousands of satisfied customers who have discovered the luxury of premium skincare.
           </p>
-          <button className="inline-flex items-center gap-3 bg-primary text-primary-foreground px-8 py-4 rounded-full font-light tracking-wide hover:shadow-2xl transition-all duration-300 ease-out group hover-lift">
+          <a href="/shop" className="inline-flex items-center gap-3 bg-primary text-primary-foreground px-8 py-4 rounded-full font-light tracking-wide hover:shadow-2xl transition-all duration-300 ease-out group hover-lift cursor-pointer">
             Explore Full Collection
             <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-          </button>
+          </a>
         </div>
       </section>
 

@@ -9,7 +9,7 @@ export function Footer() {
       href="https://aamax.co/"
       target="_blank"
       rel="noopener noreferrer"
-      className="underline hover:text-golden-500"
+      className="underline hover:text-golden-500 cursor-pointer"
     >
       AAMAX
     </a>

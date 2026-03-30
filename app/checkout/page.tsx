@@ -98,7 +98,7 @@ export default function CheckoutPage() {
             <h1 className="text-5xl md:text-6xl font-light text-foreground text-balance">Your cart is empty</h1>
             <Link
               href="/shop"
-              className="inline-flex items-center gap-2 bg-primary hover:shadow-2xl hover:shadow-primary/40 text-primary-foreground px-8 py-3 rounded-full font-light transition-all duration-300 ease-out transform hover:scale-105"
+              className="inline-flex items-center gap-2 bg-primary hover:shadow-2xl hover:shadow-primary/40 text-primary-foreground px-8 py-3 rounded-full font-light transition-all duration-300 ease-out transform hover:scale-105 cursor-pointer"
             >
               Return to Shop
               <ArrowRight className="w-4 h-4" />
@@ -329,7 +329,7 @@ export default function CheckoutPage() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full bg-gradient-to-r from-primary to-primary/90 text-primary-foreground py-4 rounded-xl font-light tracking-wide text-lg hover:shadow-2xl hover:shadow-primary/40 transition-all duration-300 ease-out transform hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 group relative overflow-hidden"
+                className="w-full bg-gradient-to-r from-primary to-primary/90 text-primary-foreground py-4 rounded-xl font-light tracking-wide text-lg hover:shadow-2xl hover:shadow-primary/40 transition-all duration-300 ease-out transform hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 group relative overflow-hidden cursor-pointer"
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent transform -skew-x-12 group-hover:translate-x-full transition-transform duration-500"></div>
                 {isSubmitting ? (

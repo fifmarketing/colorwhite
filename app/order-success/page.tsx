@@ -153,7 +153,7 @@ export default function OrderSuccessPage() {
         <div className="flex flex-col sm:flex-row gap-5 justify-center items-center mb-16">
           <Link
             href="/shop"
-            className="w-full sm:w-auto px-10 py-5 rounded-2xl font-semibold tracking-wider text-lg bg-gradient-to-r from-primary via-primary to-primary/80 text-primary-foreground shadow-2xl shadow-primary/40 hover:shadow-primary/60 transition-all duration-300 ease-out transform hover:scale-110 active:scale-95 flex items-center justify-center gap-3 group relative overflow-hidden"
+            className="w-full sm:w-auto px-10 py-5 rounded-2xl font-semibold tracking-wider text-lg bg-gradient-to-r from-primary via-primary to-primary/80 text-primary-foreground shadow-2xl shadow-primary/40 hover:shadow-primary/60 transition-all duration-300 ease-out transform hover:scale-110 active:scale-95 flex items-center justify-center gap-3 group relative overflow-hidden cursor-pointer"
           >
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent transform -skew-x-12 group-hover:translate-x-full transition-transform duration-500"></div>
             <span className="relative">Continue Shopping</span>
@@ -161,7 +161,7 @@ export default function OrderSuccessPage() {
           </Link>
           <Link
             href="/"
-            className="w-full sm:w-auto px-10 py-5 rounded-2xl font-semibold tracking-wider text-lg bg-white/60 backdrop-blur-md text-foreground border-2 border-primary/40 hover:border-primary/70 hover:bg-white/90 hover:shadow-lg transition-all duration-300 ease-out transform hover:scale-105 active:scale-95"
+            className="w-full sm:w-auto px-10 py-5 rounded-2xl font-semibold tracking-wider text-lg bg-white/60 backdrop-blur-md text-foreground border-2 border-primary/40 hover:border-primary/70 hover:bg-white/90 hover:shadow-lg transition-all duration-300 ease-out transform hover:scale-105 active:scale-95 cursor-pointer"
           >
             Return to Home
           </Link>

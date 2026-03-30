@@ -57,14 +57,14 @@ export function CartConfirmationDialog({
           <Button
             variant="outline"
             onClick={handleContinueShopping}
-            className="flex-1 bg-gradient-to-r from-primary to-primary/90 hover:shadow-lg hover:shadow-primary/40"
+            className="flex-1 bg-gradient-to-r from-primary to-primary/90 hover:shadow-lg hover:shadow-primary/40 cursor-pointer"
           >
             <ShoppingBag className="w-4 h-4 mr-2" />
             Continue Shopping
           </Button>
           <Button
             onClick={handleCheckout}
-            className="flex-1 bg-gradient-to-r from-primary to-primary/90 hover:shadow-lg hover:shadow-primary/40"
+            className="flex-1 bg-gradient-to-r from-primary to-primary/90 hover:shadow-lg hover:shadow-primary/40 cursor-pointer"
           >
             Checkout
             <ArrowRight className="w-4 h-4 ml-2" />

@@ -33,7 +33,7 @@ export default function CartPage() {
                 Discover our luxurious skincare collection and add your favorite premium beauty products to your cart.
               </p>
             </div>
-            <Link href="/shop" className="inline-flex items-center gap-3 bg-gradient-to-r from-primary to-primary/90 text-primary-foreground px-8 py-4 rounded-full font-light tracking-wide hover:shadow-2xl hover:shadow-primary/40 transition-all duration-300 ease-out transform hover:scale-105 group">
+            <Link href="/shop" className="inline-flex items-center gap-3 bg-gradient-to-r from-primary to-primary/90 text-primary-foreground px-8 py-4 rounded-full font-light tracking-wide hover:shadow-2xl hover:shadow-primary/40 transition-all duration-300 ease-out transform hover:scale-105 group cursor-pointer">
               Continue Shopping
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </Link>
@@ -111,7 +111,7 @@ export default function CartPage() {
                     <div className="flex items-center gap-3 bg-gradient-to-r from-primary/10 to-primary/5 rounded-xl p-2 border border-primary/20">
                       <button
                         onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                        className="p-2 hover:bg-primary/20 rounded-lg transition-all duration-300 hover:scale-110"
+                        className="p-2 hover:bg-primary/20 rounded-lg transition-all duration-300 hover:scale-110 cursor-pointer"
                       >
                         <Minus className="w-4 h-4 text-primary" />
                       </button>
@@ -120,14 +120,14 @@ export default function CartPage() {
                       </span>
                       <button
                         onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                        className="p-2 hover:bg-primary/20 rounded-lg transition-all duration-300 hover:scale-110"
+                        className="p-2 hover:bg-primary/20 rounded-lg transition-all duration-300 hover:scale-110 cursor-pointer"
                       >
                         <Plus className="w-4 h-4 text-primary" />
                       </button>
                     </div>
                     <button
                       onClick={() => removeFromCart(item.id)}
-                      className="p-3 text-destructive/70 hover:text-destructive hover:bg-destructive/10 rounded-lg transition-all duration-300 transform hover:scale-110"
+                      className="p-3 text-destructive/70 hover:text-destructive hover:bg-destructive/10 rounded-lg transition-all duration-300 transform hover:scale-110 cursor-pointer"
                     >
                       <Trash2 className="w-5 h-5" />
                     </button>
@@ -188,7 +188,7 @@ export default function CartPage() {
 
                 <Link
                   href="/checkout"
-                  className="w-full bg-gradient-to-r from-primary to-primary/90 text-primary-foreground py-4 rounded-xl font-light text-center tracking-wide hover:shadow-2xl hover:shadow-primary/40 transition-all duration-300 ease-out transform hover:scale-105 active:scale-95 flex items-center justify-center gap-2 group relative overflow-hidden"
+                  className="w-full bg-gradient-to-r from-primary to-primary/90 text-primary-foreground py-4 rounded-xl font-light text-center tracking-wide hover:shadow-2xl hover:shadow-primary/40 transition-all duration-300 ease-out transform hover:scale-105 active:scale-95 flex items-center justify-center gap-2 group relative overflow-hidden cursor-pointer"
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent transform -skew-x-12 group-hover:translate-x-full transition-transform duration-500"></div>
                   Proceed to Checkout

@@ -128,8 +128,8 @@ export default function Contact() {
                   </div>
                   <div className="flex flex-col justify-center">
                     <p className="font-light text-foreground text-lg mb-1">Email</p>
-                    <a href="mailto:hello@colorwhite.pk" className="text-foreground/70 font-light hover:text-primary transition-all duration-300 ease-out">
-                      hello@colorwhite.pk
+                    <a href="mailto:colorwhitecosmetics@gmail.com" className="text-foreground/70 font-light hover:text-primary transition-all duration-300 ease-out cursor-pointer">
+                      colorwhitecosmetics@gmail.com
                     </a>
                   </div>
                 </div>
@@ -141,8 +141,8 @@ export default function Contact() {
                   </div>
                   <div className="flex flex-col justify-center">
                     <p className="font-light text-foreground text-lg mb-1">Phone</p>
-                    <a href="tel:+923001234567" className="text-foreground/70 font-light hover:text-primary transition-all duration-300 ease-out">
-                      +92 300 123 4567
+                    <a href="tel:+923296512101" className="text-foreground/70 font-light hover:text-primary transition-all duration-300 ease-out cursor-pointer">
+                      +92 329 651 2101
                     </a>
                   </div>
                 </div>
@@ -261,7 +261,7 @@ export default function Contact() {
                   <button
                     type="submit"
                     disabled={isLoading}
-                    className="w-full bg-primary text-primary-foreground py-3 rounded-full font-light tracking-wide hover:shadow-2xl transition-all duration-300 ease-out disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    className="w-full bg-primary text-primary-foreground py-3 rounded-full font-light tracking-wide hover:shadow-2xl hover:shadow-primary/40 transition-all duration-300 ease-out disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer"
                   >
                     {isLoading ? (
                       <>

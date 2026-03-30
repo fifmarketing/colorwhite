@@ -11,7 +11,7 @@ export function WhatsAppButton() {
       href={whatsappUrl}
       target="_blank"
       rel="noopener noreferrer"
-      className="fixed bottom-6 right-6 z-40 group"
+      className="fixed bottom-6 right-6 z-40 group cursor-pointer"
       aria-label="Chat with us on WhatsApp"
     >
       {/* Button */}

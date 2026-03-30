@@ -119,7 +119,7 @@ export function ProductCard({
           {/* Quick Add Button */}
           <button 
             onClick={handleAddToCart}
-            className={`w-full mt-auto py-3 px-4 rounded-xl font-semibold transition-all duration-300 ease-out transform hover:scale-105 active:scale-95 flex items-center justify-center gap-2 group relative overflow-hidden ${
+            className={`w-full mt-auto py-3 px-4 rounded-xl font-semibold transition-all duration-300 ease-out transform hover:scale-105 active:scale-95 flex items-center justify-center gap-2 group relative overflow-hidden cursor-pointer ${
               isAdded 
                 ? 'bg-green-500 text-white shadow-lg shadow-green-500/40' 
                 : 'bg-gradient-to-r from-primary to-primary/90 text-primary-foreground hover:shadow-2xl hover:shadow-primary/40'

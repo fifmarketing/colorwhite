@@ -26,13 +26,13 @@ export function Navbar() {
           <div className="flex flex-col sm:flex-row justify-between items-center py-3 gap-3 sm:gap-0">
           
               <div className="flex items-center gap-4">
-              <a href="#" className="text-primary-foreground hover:opacity-80 transition-opacity">
+              <a href="https://www.facebook.com/" target="_blank" rel="noopener noreferrer" className="text-primary-foreground hover:opacity-80 transition-opacity cursor-pointer">
                 <Facebook className="w-4 h-4" />
               </a>
-              <a href="#" className="text-primary-foreground hover:opacity-80 transition-opacity">
+              <a href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer" className="text-primary-foreground hover:opacity-80 transition-opacity cursor-pointer">
                 <Instagram className="w-4 h-4" />
               </a>
-              <a href="#" className="text-primary-foreground hover:opacity-80 transition-opacity">
+              <a href="https://www.twitter.com/" target="_blank" rel="noopener noreferrer" className="text-primary-foreground hover:opacity-80 transition-opacity cursor-pointer">
                 <Twitter className="w-4 h-4" />
               </a>
             </div>
@@ -41,14 +41,14 @@ export function Navbar() {
               {/* Left: Shipping promo */}
             <div className="text-sm font-light tracking-wide">
               Free Shipping on orders above Rs. 2000 –{' '}
-              <Link href="/shop" className="font-semibold hover:underline">
+              <Link href="/shop" className="font-semibold hover:underline cursor-pointer">
                 Shop Now!
               </Link>
             </div>
             {/* Right: Social Links */}
             <div className="flex items-center gap-2 text-sm font-light tracking-wide">
               <Mail className="w-4 h-4" />
-              <a href="mailto:colorwhitecosmetics@gmail.com" className="hover:underline">
+              <a href="mailto:colorwhitecosmetics@gmail.com" className="hover:underline cursor-pointer">
                 colorwhitecosmetics@gmail.com
               </a>
             </div>
@@ -61,7 +61,7 @@ export function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-20">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-3 group">
+          <Link href="/" className="flex items-center gap-3 group cursor-pointer hover:text-primary transition-colors">
             <div className="relative w-12 h-12 flex-shrink-0">
               <Image
                 src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/colorwhite-logo-4cppKifpTCGggDWzJxy2cgkR3MJiY6.png"
@@ -84,7 +84,7 @@ export function Navbar() {
               <Link
                 key={link.href}
                 href={link.href}
-                className="text-sm font-light tracking-wide text-foreground hover:text-primary transition-all duration-300 ease-out relative group"
+                className="text-sm font-light tracking-wide text-foreground hover:text-primary transition-all duration-300 ease-out relative group cursor-pointer"
               >
                 {link.label}
                 <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-primary to-accent group-hover:w-full transition-all duration-300"></span>
@@ -96,7 +96,7 @@ export function Navbar() {
           <div className="flex items-center gap-4">
         
             
-            <Link href="/cart" className="p-2 hover:bg-secondary rounded-full transition-all duration-300 ease-out relative group">
+            <Link href="/cart" className="p-2 hover:bg-secondary rounded-full transition-all duration-300 ease-out relative group cursor-pointer">
               <ShoppingCart className="w-5 h-5 text-foreground group-hover:text-primary transition-colors" />
               {itemCount > 0 && (
                 <span className="absolute top-1 right-1 w-5 h-5 bg-primary text-primary-foreground text-xs rounded-full flex items-center justify-center font-semibold animate-pulse">
@@ -108,7 +108,7 @@ export function Navbar() {
             {/* Mobile menu button */}
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="md:hidden p-2 hover:bg-secondary rounded-full transition-all duration-300 ease-out"
+              className="md:hidden p-2 hover:bg-secondary rounded-full transition-all duration-300 ease-out cursor-pointer"
             >
               {isOpen ? (
                 <X className="w-6 h-6 text-foreground" />
@@ -126,7 +126,7 @@ export function Navbar() {
               <Link
                 key={link.href}
                 href={link.href}
-                className="block px-4 py-2 text-sm font-light text-foreground hover:bg-secondary rounded-lg transition-all duration-300 ease-out"
+                className="block px-4 py-2 text-sm font-light text-foreground hover:bg-secondary rounded-lg transition-all duration-300 ease-out cursor-pointer"
                 onClick={() => setIsOpen(false)}
               >
                 {link.label}
