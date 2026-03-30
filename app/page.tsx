@@ -3,6 +3,7 @@ import { Navbar } from '@/components/navbar'
 import { Footer } from '@/components/footer'
 import { ProductCard } from '@/components/product-card'
 import { TestimonialCard } from '@/components/testimonial-card'
+import { PromoBanner } from '@/components/promo-banner'
 import { ArrowRight } from 'lucide-react'
 
 const products = [
@@ -95,6 +96,7 @@ const testimonials = [
 export default function Home() {
   return (
     <main className="min-h-screen bg-background">
+      <PromoBanner />
       <Navbar />
 
       {/* Hero Section */}
