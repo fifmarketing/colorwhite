@@ -28,12 +28,13 @@ export default function About() {
           <div className="grid md:grid-cols-2 gap-12 items-center">
             {/* Image */}
             <div className="order-2 md:order-1">
-              <div className="relative aspect-square rounded-3xl overflow-hidden shadow-2xl">
+              <div className="relative aspect-square rounded-3xl overflow-hidden shadow-2xl bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center">
                 <Image
-                  src="/images/about-image.jpg"
-                  alt="Color White Beauty Story"
-                  fill
-                  className="object-cover"
+                  src="/about-serum.jpg"
+                  alt="Color White Beauty Premium Serum"
+                  width={500}
+                  height={500}
+                  className="object-contain p-8"
                 />
               </div>
             </div>
