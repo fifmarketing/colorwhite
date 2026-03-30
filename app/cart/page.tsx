@@ -66,9 +66,9 @@ export default function CartPage() {
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Cart Items */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="lg:col-span-2 space-y-6 order-1 lg:order-1">
             {items.map((item, index) => (
               <div
                 key={item.id}
@@ -148,58 +148,58 @@ export default function CartPage() {
           </div>
 
           {/* Order Summary Sidebar */}
-          <div className="lg:col-span-1">
-            <div className="sticky top-24 space-y-6">
+          <div className="lg:col-span-1 order-2 lg:order-2">
+            <div className="sticky top-24 space-y-6 lg:space-y-6">
               {/* Main Summary Card */}
-              <div className="p-8 rounded-3xl bg-gradient-to-b from-primary/5 to-primary/2 border border-primary/20 shadow-2xl shadow-primary/10 backdrop-blur-sm">
-                <h2 className="text-2xl font-light text-foreground mb-8 text-balance">
+              <div className="p-6 md:p-8 rounded-2xl md:rounded-3xl bg-gradient-to-b from-primary/5 to-primary/2 border border-primary/20 shadow-2xl shadow-primary/10 backdrop-blur-sm">
+                <h2 className="text-xl md:text-2xl font-light text-foreground mb-6 md:mb-8 text-balance">
                   Order Summary
                 </h2>
 
-                <div className="space-y-4 mb-6 pb-6 border-b border-primary/20">
+                <div className="space-y-3 md:space-y-4 mb-6 pb-6 border-b border-primary/20">
                   <div className="flex justify-between items-center">
-                    <span className="font-light text-foreground/70">Subtotal</span>
-                    <span className="font-light text-foreground">
+                    <span className="font-light text-sm md:text-base text-foreground/70">Subtotal</span>
+                    <span className="font-light text-sm md:text-base text-foreground">
                       Rs. {subtotal.toLocaleString()}
                     </span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="font-light text-foreground/70">Shipping</span>
-                    <span className="font-light text-foreground">
+                    <span className="font-light text-sm md:text-base text-foreground/70">Shipping</span>
+                    <span className="font-light text-sm md:text-base text-foreground">
                       Rs. {shipping.toLocaleString()}
                     </span>
                   </div>
                   {savings > 0 && (
                     <div className="flex justify-between items-center pt-2 border-t border-primary/10">
-                      <span className="font-light text-foreground/70">Savings</span>
-                      <span className="font-light text-green-600">
+                      <span className="font-light text-sm md:text-base text-foreground/70">Savings</span>
+                      <span className="font-light text-sm md:text-base text-green-600">
                         -Rs. {savings.toLocaleString()}
                       </span>
                     </div>
                   )}
                 </div>
 
-                <div className="flex justify-between items-center mb-8 p-4 rounded-xl bg-gradient-to-r from-primary/20 to-primary/10 border border-primary/30">
-                  <span className="text-lg font-light text-foreground">Total</span>
-                  <span className="text-3xl font-light text-primary">
+                <div className="flex justify-between items-center mb-6 md:mb-8 p-3 md:p-4 rounded-lg md:rounded-xl bg-gradient-to-r from-primary/20 to-primary/10 border border-primary/30">
+                  <span className="text-base md:text-lg font-light text-foreground">Total</span>
+                  <span className="text-2xl md:text-3xl font-light text-primary">
                     Rs. {total.toLocaleString()}
                   </span>
                 </div>
 
                 <Link
                   href="/checkout"
-                  className="w-full bg-gradient-to-r from-primary to-primary/90 text-primary-foreground py-4 rounded-xl font-light text-center tracking-wide hover:shadow-2xl hover:shadow-primary/40 transition-all duration-300 ease-out transform hover:scale-105 active:scale-95 flex items-center justify-center gap-2 group relative overflow-hidden cursor-pointer"
+                  className="w-full bg-gradient-to-r from-primary to-primary/90 text-primary-foreground py-3 md:py-4 rounded-lg md:rounded-xl font-light text-center text-sm md:text-base tracking-wide hover:shadow-2xl hover:shadow-primary/40 transition-all duration-300 ease-out transform hover:scale-105 active:scale-95 flex items-center justify-center gap-2 group relative overflow-hidden cursor-pointer"
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent transform -skew-x-12 group-hover:translate-x-full transition-transform duration-500"></div>
                   Proceed to Checkout
-                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                  <ArrowRight className="w-4 md:w-5 h-4 md:h-5 group-hover:translate-x-1 transition-transform" />
                 </Link>
 
                
               </div>
 
               {/* Trust Badge */}
-              <div className="p-6 rounded-2xl bg-white/30 backdrop-blur-sm border border-primary/10 text-center">
+              <div className="p-4 md:p-6 rounded-xl md:rounded-2xl bg-white/30 backdrop-blur-sm border border-primary/10 text-center hidden md:block">
                 <p className="text-xs font-light text-foreground/70 leading-relaxed">
                   ✓ Secure Payment  •  ✓ Fast Delivery  •  ✓ Easy Returns
                 </p>
