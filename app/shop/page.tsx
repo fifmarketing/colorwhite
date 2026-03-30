@@ -3,15 +3,15 @@ import { Footer } from '@/components/footer'
 import { ProductCard } from '@/components/product-card'
 
 const allProducts = [
-  { id: 1, name: 'Radiant White Moisture Cream', price: 1999, image: '/images/cream-jar-1.jpg', rating: 4.9 },
-  { id: 2, name: 'Luxury Face Serum', price: 1499, image: '/images/cream-jar-2.jpg', rating: 4.8 },
-  { id: 3, name: 'Premium Night Treatment', price: 2299, image: '/images/cream-jar-3.jpg', rating: 4.7 },
-  { id: 4, name: 'Brightening Day Cream', price: 1799, image: '/images/cream-jar-1.jpg', rating: 4.9 },
-  { id: 5, name: 'Intensive Eye Contour', price: 1599, image: '/images/cream-jar-2.jpg', rating: 4.8 },
-  { id: 6, name: 'Nourishing Body Lotion', price: 1299, image: '/images/cream-jar-3.jpg', rating: 4.7 },
-  { id: 7, name: 'Hydrating Face Mask', price: 1399, image: '/images/cream-jar-1.jpg', rating: 4.9 },
-  { id: 8, name: 'Anti-Aging Neck Cream', price: 1699, image: '/images/cream-jar-2.jpg', rating: 4.8 },
-  { id: 9, name: 'Brightening Cleanser', price: 999, image: '/images/cream-jar-3.jpg', rating: 4.7 },
+  { id: 1, name: 'Radiant White Moisture Cream', price: 1999, image: '/beauty-cream.jpg', rating: 4.9 },
+  { id: 2, name: 'Urgent Whitening Serum', price: 1499, image: '/serum.jpg', rating: 4.8 },
+  { id: 3, name: 'Whitening Body Lotion Pack', price: 2299, image: '/lotion-pack.jpg', rating: 4.7 },
+  { id: 4, name: 'Bright Complexion Face Wash', price: 1799, image: '/face-wash-pink.jpg', rating: 4.9 },
+  { id: 5, name: 'Premium Bridal Pack', price: 1599, image: '/bridal-pack.jpg', rating: 4.8 },
+  { id: 6, name: 'Natural Moisture Care Soap', price: 1299, image: '/soap-pack.jpg', rating: 4.7 },
+  { id: 7, name: 'Beauty Cream & Face Wash', price: 1399, image: '/face-wash-cream.jpg', rating: 4.9 },
+  { id: 8, name: 'Complete Skincare Set', price: 1699, image: '/product-display.jpg', rating: 4.8 },
+  { id: 9, name: 'Beauty Soap Bar Set', price: 999, image: '/beauty-soap.jpg', rating: 4.7 },
 ]
 
 export default function Shop() {
