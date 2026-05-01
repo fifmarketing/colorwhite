@@ -3,6 +3,10 @@ import { Footer } from '@/components/footer'
 import { ProductCard } from '@/components/product-card'
 
 const allProducts = [
+  { id: 10, name: 'Soft & Glow Hand & Foot Beauty Cream', price: 899, image: '/hand-foot-cream.png', rating: 4.9 },
+  { id: 11, name: 'Bright Complexion Cream with Serum', price: 2499, image: '/bright-cream-serum.png', rating: 4.9 },
+  { id: 12, name: 'Beauty Cream & Bright Complexion Serum', price: 2799, image: '/beauty-cream-serum.png', rating: 5.0 },
+  { id: 13, name: 'Bright Complexion Serum', price: 1599, image: '/bright-serum.png', rating: 4.9 },
   { id: 1, name: 'Radiant White Moisture Cream', price: 1999, image: '/beauty-cream.jpg', rating: 4.9 },
   { id: 2, name: 'Urgent Whitening Serum', price: 1499, image: '/serum.jpg', rating: 4.8 },
   { id: 3, name: 'Whitening Body Lotion Pack', price: 2299, image: '/lotion-pack.jpg', rating: 4.7 },

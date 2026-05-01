@@ -8,6 +8,50 @@ import { ArrowRight } from 'lucide-react'
 
 const products = [
   {
+    id: 7,
+    name: 'Soft & Glow Hand & Foot Beauty Cream',
+    category: 'HAND & FOOT CARE',
+    price: 899,
+    originalPrice: 1099,
+    image: '/hand-foot-cream.png',
+    rating: 4.9,
+    reviews: 1245,
+    discount: 18,
+  },
+  {
+    id: 8,
+    name: 'Bright Complexion Cream with Serum',
+    category: 'COMPLEXION DUO SET',
+    price: 2499,
+    originalPrice: 2899,
+    image: '/bright-cream-serum.png',
+    rating: 4.93,
+    reviews: 2087,
+    discount: 14,
+  },
+  {
+    id: 9,
+    name: 'Beauty Cream & Bright Complexion Serum',
+    category: '5-DAY CHALLENGE PACK',
+    price: 2799,
+    originalPrice: 3299,
+    image: '/beauty-cream-serum.png',
+    rating: 4.95,
+    reviews: 3120,
+    discount: 15,
+  },
+  {
+    id: 10,
+    name: 'Bright Complexion Serum',
+    category: 'VITAMIN C & PEARL EXTRACT',
+    price: 1599,
+    originalPrice: 1899,
+    image: '/bright-serum.png',
+    rating: 4.91,
+    reviews: 1876,
+    discount: 16,
+  },
+  {
     id: 1,
     name: 'Whitening Body Lotion Pack',
     category: 'COMPLETE BODY CARE',
@@ -165,7 +209,7 @@ Color White Beauty Cream                </h1>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {products.slice(0, 6).map((product) => (
+            {products.map((product) => (
               <ProductCard key={product.id} {...product} />
             ))}
           </div>
