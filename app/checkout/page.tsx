@@ -79,11 +79,34 @@ export default function CheckoutPage() {
 
     setIsSubmitting(true)
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1500))
+      const response = await fetch('/api/order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...formData,
+          items: items.map((item) => ({
+            id: item.id,
+            name: item.name,
+            price: item.price,
+            quantity: item.quantity,
+          })),
+          subtotal,
+          shipping,
+          total,
+        }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to place order')
+      }
+
       clearCart()
       router.push('/order-success')
     } catch (error) {
       console.error('Order submission error:', error)
+      setErrors({ submit: error instanceof Error ? error.message : 'Something went wrong. Please try again.' })
     } finally {
       setIsSubmitting(false)
     }
@@ -324,6 +347,12 @@ export default function CheckoutPage() {
                   </label>
                 </div>
               </div>
+
+              {errors.submit && (
+                <div className="p-4 rounded-xl bg-destructive/10 border border-destructive/20 text-destructive text-sm font-light">
+                  {errors.submit}
+                </div>
+              )}
 
               {/* Submit Button */}
               <button

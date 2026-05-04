@@ -40,15 +40,16 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const fromEmail = process.env.FROM_EMAIL || 'noreply@example.com'
-    const fromName = process.env.FROM_NAME || 'My App'
-    const adminEmail = process.env.FROM_EMAIL || 'admin@example.com'
+    const fromEmail = process.env.FROM_EMAIL || 'onboarding@resend.dev'
+    const fromName = process.env.FROM_NAME || 'Tulu e Biz'
+    const adminEmail = process.env.ADMIN_EMAIL || 'colorwhitecosmetics@gmail.com'
 
     // Send email to admin
     const adminEmailResult = await resend.emails.send({
       from: `${fromName} <${fromEmail}>`,
       to: adminEmail,
-      subject: `🎯 New Contact: ${body.subject}`,
+      replyTo: body.email,
+      subject: `New Contact: ${body.subject}`,
       html: `
         <!DOCTYPE html>
         <html>
