@@ -3,18 +3,17 @@ import { Footer } from '@/components/footer'
 import { ProductCard } from '@/components/product-card'
 
 const allProducts = [
-  { id: 10, name: 'Soft & Glow Hand & Foot Beauty Cream', price: 899, image: '/hand-foot-cream.png', rating: 4.9 },
-  { id: 11, name: 'Bright Complexion Cream with Serum', price: 2499, image: '/bright-cream-serum.png', rating: 4.9 },
-  { id: 12, name: 'Beauty Cream & Bright Complexion Serum', price: 2799, image: '/beauty-cream-serum.png', rating: 5.0 },
-  { id: 13, name: 'Bright Complexion Serum', price: 1599, image: '/bright-serum.png', rating: 4.9 },
-  { id: 1, name: 'Radiant White Moisture Cream', price: 1999, image: '/beauty-cream.jpg', rating: 4.9 },
-  { id: 2, name: 'Urgent Whitening Serum', price: 1499, image: '/serum.jpg', rating: 4.8 },
+  { id: 10, name: 'Soft & Glow Hand & Foot Beauty Cream', price: 899, image: '/clour.jpg', rating: 4.9 },
+  { id: 11, name: 'Bright Complexion Cream with Serum', price: 2499, image: '/bri.png', rating: 4.9 },
+  { id: 12, name: 'Beauty Cream & Bright Complexion Serum', price: 2799, image: '/com.png', rating: 5.0 },
+  { id: 13, name: 'Bright Complexion Serum', price: 1599, image: '/foutrh.jpg', rating: 4.9 },
+  { id: 1, name: 'Radiant White Moisture Cream', price: 1999, image: '/fifth.png', rating: 4.9 },
+  { id: 2, name: 'Urgent Whitening Serum', price: 1499, image: '/comsix.png', rating: 4.8 },
   { id: 3, name: 'Whitening Body Lotion Pack', price: 2299, image: '/lotion-pack.jpg', rating: 4.7 },
   { id: 4, name: 'Bright Complexion Face Wash', price: 1799, image: '/face-wash-pink.jpg', rating: 4.9 },
   { id: 5, name: 'Premium Bridal Pack', price: 1599, image: '/bridal-pack.jpg', rating: 4.8 },
   { id: 6, name: 'Natural Moisture Care Soap', price: 1299, image: '/soap-pack.jpg', rating: 4.7 },
   { id: 7, name: 'Beauty Cream & Face Wash', price: 1399, image: '/face-wash-cream.jpg', rating: 4.9 },
-  { id: 8, name: 'Complete Skincare Set', price: 1699, image: '/product-display.jpg', rating: 4.8 },
   { id: 9, name: 'Beauty Soap Bar Set', price: 999, image: '/beauty-soap.jpg', rating: 4.7 },
 ]
 
