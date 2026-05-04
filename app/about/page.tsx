@@ -1,4 +1,3 @@
-import Image from 'next/image'
 import { Navbar } from '@/components/navbar'
 import { Footer } from '@/components/footer'
 import { Check } from 'lucide-react'
@@ -26,21 +25,25 @@ export default function About() {
       <section className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-2 gap-12 items-center">
-            {/* Image */}
-            <div className="order-2 md:order-1">
-              <div className="relative aspect-square rounded-3xl overflow-hidden shadow-2xl bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center">
-                <Image
-                  src="/about-serum.jpg"
-                  alt="Color White Beauty Premium Serum"
-                  width={500}
-                  height={500}
-                  className="object-contain p-8"
-                />
+            {/* Video */}
+            <div className="w-full">
+              <div className="bg-black rounded-3xl overflow-hidden shadow-2xl">
+                <div className="relative w-full bg-black" style={{ paddingBottom: '100%' }}>
+                  <video
+                    src="/about-video.mp4"
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    controls
+                    className="absolute inset-0 w-full h-full object-cover"
+                  />
+                </div>
               </div>
             </div>
 
             {/* Content */}
-            <div className="order-1 md:order-2 space-y-8">
+            <div className="space-y-8">
               <div className="space-y-4">
                 <h2 className="text-4xl font-light tracking-tight text-foreground">
                   Our Mission
