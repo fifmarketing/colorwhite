@@ -40,8 +40,8 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const fromEmail = process.env.FROM_EMAIL || 'onboarding@resend.dev'
-    const fromName = process.env.FROM_NAME || 'Tulu e Biz'
+    const fromEmail = process.env.FROM_EMAIL 
+    const fromName = process.env.FROM_NAME
     const adminEmail = process.env.ADMIN_EMAIL || 'colorwhitecosmetics@gmail.com'
 
     // Send email to admin
