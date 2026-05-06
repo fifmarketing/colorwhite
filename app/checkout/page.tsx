@@ -33,24 +33,22 @@ export default function CheckoutPage() {
   const [formData, setFormData] = useState<FormData>(initialFormData)
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [saveInfo, setSaveInfo] = useState(false)
 
   const subtotal = getCartTotal()
-  const shipping = items.length > 0 ? 150 : 0
+  const shipping = items.length > 0 ? 200 : 0
   const total = subtotal + shipping
 
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {}
 
     if (!formData.fullName.trim()) newErrors.fullName = 'Full name is required'
-    if (!formData.email.trim()) {
-      newErrors.email = 'Email is required'
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+    if (formData.email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       newErrors.email = 'Please enter a valid email'
     }
     if (!formData.phone.trim()) newErrors.phone = 'Phone number is required'
     if (!formData.address.trim()) newErrors.address = 'Shipping address is required'
     if (!formData.city.trim()) newErrors.city = 'City is required'
-    if (!formData.postalCode.trim()) newErrors.postalCode = 'Postal code is required'
 
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
@@ -195,7 +193,7 @@ export default function CheckoutPage() {
                   {/* Email */}
                   <div>
                     <label className="block text-sm font-light text-foreground mb-2 tracking-wide">
-                      Email Address <span className="text-primary">*</span>
+                      Email Address
                     </label>
                     <input
                       type="email"
@@ -256,6 +254,24 @@ export default function CheckoutPage() {
                     {errors.address && (
                       <p className="text-sm text-destructive mt-2 font-light">{errors.address}</p>
                     )}
+                    
+                    {/* Save Information Checkbox */}
+                    <label className="flex items-center gap-3 mt-4 cursor-pointer group">
+                      <div className="relative">
+                        <input
+                          type="checkbox"
+                          checked={saveInfo}
+                          onChange={(e) => setSaveInfo(e.target.checked)}
+                          className="w-5 h-5 appearance-none border-2 border-primary/30 rounded bg-white/50 checked:bg-primary checked:border-primary cursor-pointer transition-all duration-200"
+                        />
+                        {saveInfo && (
+                          <Check className="absolute w-3 h-3 text-white top-1 left-1 pointer-events-none" />
+                        )}
+                      </div>
+                      <span className="text-sm font-light text-foreground/80 group-hover:text-foreground transition-colors">
+                        Save this information for next time
+                      </span>
+                    </label>
                   </div>
 
                   {/* City, Postal Code */}
@@ -283,23 +299,16 @@ export default function CheckoutPage() {
 
                     <div>
                       <label className="block text-sm font-light text-foreground mb-2 tracking-wide">
-                        Postal Code <span className="text-primary">*</span>
+                        Postal Code
                       </label>
                       <input
                         type="text"
                         name="postalCode"
                         value={formData.postalCode}
                         onChange={handleChange}
-                        className={`w-full px-5 py-3 rounded-xl bg-gradient-to-r from-primary/5 to-transparent border-2 transition-all duration-300 ${
-                          errors.postalCode 
-                            ? 'border-destructive focus:border-destructive' 
-                            : 'border-primary/20 focus:border-primary/60'
-                        } text-foreground font-light focus:outline-none focus:ring-2 focus:ring-primary/20`}
+                        className="w-full px-5 py-3 rounded-xl bg-gradient-to-r from-primary/5 to-transparent border-2 transition-all duration-300 border-primary/20 focus:border-primary/60 text-foreground font-light focus:outline-none focus:ring-2 focus:ring-primary/20"
                         placeholder="Postal Code"
                       />
-                      {errors.postalCode && (
-                        <p className="text-sm text-destructive mt-2 font-light">{errors.postalCode}</p>
-                      )}
                     </div>
                   </div>
                 </div>
