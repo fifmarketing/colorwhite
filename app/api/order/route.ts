@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { Resend } from 'resend'
+import { getDb } from '@/lib/mongodb'
 
 interface OrderItem {
   id: string | number
@@ -66,6 +67,28 @@ export async function POST(request: NextRequest) {
       hour: '2-digit',
       minute: '2-digit',
     })
+
+    // Save order to MongoDB
+    try {
+      const db = await getDb()
+      await db.collection('orders').insertOne({
+        orderId,
+        fullName: body.fullName,
+        email: body.email,
+        phone: body.phone,
+        address: body.address,
+        city: body.city,
+        postalCode: body.postalCode,
+        items: body.items,
+        subtotal: body.subtotal,
+        shipping: body.shipping,
+        total: body.total,
+        status: 'pending',
+        createdAt: new Date(),
+      })
+    } catch (dbError) {
+      console.error('[v0] Failed to save order to database:', dbError)
+    }
 
     // Build items HTML rows
     const itemsHtml = body.items

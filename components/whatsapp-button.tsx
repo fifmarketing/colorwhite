@@ -2,9 +2,14 @@
 
 import { ArrowUp } from 'lucide-react'
 import { useState, useEffect } from 'react'
+import { usePathname } from 'next/navigation'
 
-export default function WhatsAppButton() {
-  const phoneNumber = '+923404476857'
+export default function WhatsAppButton({
+  phoneNumber = '+923404476857',
+}: {
+  phoneNumber?: string
+}) {
+  const pathname = usePathname()
   const whatsappUrl = `https://wa.me/${phoneNumber.replace(/\D/g, '')}`
   const [showScrollTop, setShowScrollTop] = useState(false)
 
@@ -22,6 +27,11 @@ export default function WhatsAppButton() {
       top: 0,
       behavior: 'smooth'
     })
+  }
+
+  // Hide the floating buttons inside the admin panel
+  if (pathname?.startsWith('/admin')) {
+    return null
   }
 
   return (

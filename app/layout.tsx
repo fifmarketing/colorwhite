@@ -2,32 +2,38 @@ import type { Metadata } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { CartProvider } from '@/context/CartContext'
-import WhatsAppButton from '../components/whatsapp-button' // ✅ correct import
+import WhatsAppButton from '../components/whatsapp-button'
+import { getSettings } from '@/lib/data'
 import './globals.css'
 
 const _geist = Geist({ subsets: ["latin"] });
 const _geistMono = Geist_Mono({ subsets: ["latin"] });
 
-export const metadata: Metadata = {
-  title: 'Color White Beauty | Premium Skincare Collection',
-  description: 'Discover luxury skincare products by Color White Beauty. Premium creams, serums, and treatments crafted for radiant skin. Shop now!',
-  generator: 'v0.app',
-  icons: {
-    icon: '/favicon.ico',
-  },
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getSettings()
+  return {
+    title: settings.seo.siteTitle,
+    description: settings.seo.siteDescription,
+    generator: 'v0.app',
+    icons: {
+      icon: '/favicon.ico',
+    },
+  }
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  const settings = await getSettings()
+
   return (
     <html lang="en">
       <body className="font-sans antialiased">
         <CartProvider>
           {children}
-          <WhatsAppButton />
+          <WhatsAppButton phoneNumber={settings.whatsapp.phoneNumber} />
         </CartProvider>
         <Analytics />
       </body>

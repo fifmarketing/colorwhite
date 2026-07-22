@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { Resend } from 'resend'
+import { getDb } from '@/lib/mongodb'
 
 interface ContactFormData {
   name: string
@@ -38,6 +39,22 @@ export async function POST(request: NextRequest) {
         { error: 'Message must be at least 10 characters' },
         { status: 400 }
       )
+    }
+
+    // Save message to MongoDB
+    try {
+      const db = await getDb()
+      await db.collection('messages').insertOne({
+        name: body.name,
+        email: body.email,
+        phone: body.phone || '',
+        subject: body.subject,
+        message: body.message,
+        read: false,
+        createdAt: new Date(),
+      })
+    } catch (dbError) {
+      console.error('[v0] Failed to save message to database:', dbError)
     }
 
     const fromEmail = process.env.FROM_EMAIL 

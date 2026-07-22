@@ -1,8 +1,15 @@
 import { Navbar } from '@/components/navbar'
 import { Footer } from '@/components/footer'
+import { HighlightedText } from '@/components/highlighted-text'
 import { Check } from 'lucide-react'
+import { getSettings } from '@/lib/data'
 
-export default function About() {
+export const dynamic = 'force-dynamic'
+
+export default async function About() {
+  const settings = await getSettings()
+  const { aboutPage, footer } = settings
+
   return (
     <main className="min-h-screen bg-background">
       <Navbar />
@@ -12,10 +19,10 @@ export default function About() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center space-y-4">
             <p className="text-primary font-light tracking-widest uppercase text-sm">
-              Our Story
+              {aboutPage.heroEyebrow}
             </p>
             <h1 className="text-5xl md:text-6xl font-light tracking-tight text-foreground text-balance">
-              About <span className="gradient-gold">Color White</span> Beauty
+              <HighlightedText text={aboutPage.heroTitle} />
             </h1>
           </div>
         </div>
@@ -46,25 +53,19 @@ export default function About() {
             <div className="space-y-8">
               <div className="space-y-4">
                 <h2 className="text-4xl font-light tracking-tight text-foreground">
-                  Our Mission
+                  {aboutPage.missionTitle}
                 </h2>
                 <p className="text-lg font-light text-foreground/70 leading-relaxed text-balance">
-                  At Color White Beauty, we believe that true luxury is about quality, authenticity, and results. Our mission is to provide premium skincare solutions that combine nature&apos;s finest ingredients with modern beauty science.
+                  {aboutPage.missionText}
                 </p>
               </div>
 
               <div className="space-y-4">
                 <h2 className="text-4xl font-light tracking-tight text-foreground">
-                  Why Choose Us
+                  {aboutPage.whyChooseTitle}
                 </h2>
                 <div className="space-y-3">
-                  {[
-                    'Carefully selected, premium natural ingredients',
-                    'Dermatologically tested and proven effective',
-                    'Cruelty-free and ethically sourced',
-                    'Scientifically formulated for all skin types',
-                    'Luxury packaging with exceptional quality',
-                  ].map((item, i) => (
+                  {aboutPage.whyChoosePoints.map((item, i) => (
                     <div key={i} className="flex items-start gap-3">
                       <div className="mt-1">
                         <Check className="w-5 h-5 text-primary flex-shrink-0" />
@@ -84,25 +85,12 @@ export default function About() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-light tracking-tight text-foreground mb-4">
-              Our Values
+              {aboutPage.valuesTitle}
             </h2>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            {[
-              {
-                title: 'Premium Quality',
-                desc: 'Every product is crafted with meticulous attention to detail, ensuring the highest standards of excellence.',
-              },
-              {
-                title: 'Natural Excellence',
-                desc: 'We source the finest natural ingredients from around the world, combined with cutting-edge formulation.',
-              },
-              {
-                title: 'Customer First',
-                desc: 'Your satisfaction is our priority. We stand behind every product with our commitment to quality.',
-              },
-            ].map((value, i) => (
+            {aboutPage.values.map((value, i) => (
               <div key={i} className="group hover-lift">
                 <div className="bg-card rounded-3xl p-8 shadow-luxury h-full space-y-4">
                   <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-accent"></div>
@@ -123,18 +111,17 @@ export default function About() {
       <section className="py-20">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6">
           <h2 className="text-4xl md:text-5xl font-light tracking-tight text-foreground">
-            Our Vision
+            {aboutPage.visionTitle}
           </h2>
-          <p className="text-xl font-light text-foreground/70 leading-relaxed text-balance">
-            We envision a world where premium skincare is accessible to everyone who desires it. By combining luxury with affordability, we&apos;re revolutionizing the beauty industry and empowering individuals to feel confident in their own skin.
-          </p>
-          <p className="text-xl font-light text-foreground/70 leading-relaxed text-balance">
-            Each product in our collection is a promise—a promise of quality, efficacy, and the transformative power of self-care.
-          </p>
+          {aboutPage.visionParagraphs.map((paragraph, i) => (
+            <p key={i} className="text-xl font-light text-foreground/70 leading-relaxed text-balance">
+              {paragraph}
+            </p>
+          ))}
         </div>
       </section>
 
-      <Footer />
+      <Footer {...footer} />
     </main>
   )
 }

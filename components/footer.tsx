@@ -1,8 +1,33 @@
 'use client'
 
 import { Mail } from 'lucide-react'
+import useSWR from 'swr'
 
-export function Footer() {
+interface FooterProps {
+  email?: string
+  instagramUrl?: string
+  facebookUrl?: string
+  copyrightText?: string
+}
+
+const fetcher = (url: string) => fetch(url).then((res) => res.json())
+
+export function Footer(props: FooterProps) {
+  // When no props are passed (client-only pages), hydrate footer content
+  // from the public settings endpoint so admin edits are always reflected.
+  const hasProps = props.email !== undefined
+  const { data } = useSWR(hasProps ? null : '/api/settings', fetcher, {
+    revalidateOnFocus: false,
+  })
+
+  const email = props.email ?? data?.footer?.email ?? 'colorwhitecosmetics@gmail.com'
+  const instagramUrl =
+    props.instagramUrl ?? data?.footer?.instagramUrl ?? 'https://www.instagram.com/colorwhitecosmetics/'
+  const facebookUrl =
+    props.facebookUrl ?? data?.footer?.facebookUrl ?? 'https://web.facebook.com/ColorWhiteBeautyCream'
+  const copyrightText =
+    props.copyrightText ?? data?.footer?.copyrightText ?? 'Copyright © 2026 Color White Beauty'
+
   return (
     <footer className="bg-secondary text-foreground">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
@@ -20,7 +45,7 @@ export function Footer() {
             <div className="flex gap-6 md:gap-8">
               {/* Instagram */}
               <a 
-                href="https://www.instagram.com/colorwhitecosmetics/" 
+                href={instagramUrl} 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="group relative"
@@ -36,7 +61,7 @@ export function Footer() {
 
               {/* Facebook */}
               <a 
-                href="https://web.facebook.com/ColorWhiteBeautyCream" 
+                href={facebookUrl} 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="group relative"
@@ -59,8 +84,8 @@ export function Footer() {
           <div className="flex flex-col sm:flex-row justify-center items-center gap-6">
             <div className="flex items-center gap-2 text-xs sm:text-sm font-light tracking-wide">
               <Mail className="w-4 h-4" />
-              <a href="mailto:colorwhitecosmetics@gmail.com" className="hover:text-primary transition-colors cursor-pointer">
-                colorwhitecosmetics@gmail.com
+              <a href={`mailto:${email}`} className="hover:text-primary transition-colors cursor-pointer">
+                {email}
               </a>
             </div>
           </div>
@@ -69,7 +94,7 @@ export function Footer() {
           {/* Copyright */}
           <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
             <p className="text-xs sm:text-sm md:text-base font-light tracking-wide text-center">
-              Copyright © 2026 Color White Beauty | Made with ❤️ by{" "}
+              {copyrightText} | Made with ❤️ by{" "}
               <a
                 href="https://aamax.co/"
                 target="_blank"
