@@ -16,7 +16,9 @@ export async function generateMetadata(): Promise<Metadata> {
     description: settings.seo.siteDescription,
     generator: 'v0.app',
     icons: {
-      icon: '/favicon.ico',
+      icon: '/logo.jpg',
+      shortcut: '/logo.jpg',
+      apple: '/logo.jpg',
     },
   }
 }
