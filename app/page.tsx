@@ -95,6 +95,7 @@ export default async function Home() {
               <ProductCard
                 key={product._id}
                 id={product.productId}
+                slug={product.slug}
                 name={product.name}
                 category={product.category}
                 price={product.price}

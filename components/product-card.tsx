@@ -1,13 +1,16 @@
 'use client'
 
 import Image from 'next/image'
-import { Star, Sparkles } from 'lucide-react'
+import Link from 'next/link'
+import { Star, Sparkles, ArrowRight } from 'lucide-react'
 import { useCart } from '@/context/CartContext'
 import { CartConfirmationDialog } from './cart-confirmation-dialog'
 import { useState } from 'react'
 
 interface ProductCardProps {
   id: number
+  /** URL segment for the product detail page. Omit to render a non-linked card. */
+  slug?: string
   name: string
   price: number
   originalPrice?: number
@@ -18,8 +21,31 @@ interface ProductCardProps {
   category?: string
 }
 
+/** Renders the square image well, wrapped in a link to the detail page when available. */
+function ImageFrame({
+  href,
+  name,
+  children,
+}: {
+  href: string | null
+  name: string
+  children: React.ReactNode
+}) {
+  const className =
+    'aspect-square bg-gradient-to-br from-secondary to-primary/5 relative overflow-hidden ring-2 ring-primary/20 group-hover:ring-primary/40 transition-all duration-300'
+
+  if (!href) return <div className={className}>{children}</div>
+
+  return (
+    <Link href={href} aria-label={`View details for ${name}`} className={`${className} block`}>
+      {children}
+    </Link>
+  )
+}
+
 export function ProductCard({ 
   id, 
+  slug,
   name, 
   price, 
   originalPrice,
@@ -32,6 +58,7 @@ export function ProductCard({
   const { addToCart } = useCart()
   const [showDialog, setShowDialog] = useState(false)
   const [isAdded, setIsAdded] = useState(false)
+  const href = slug ? `/product/${slug}` : null
 
   const handleAddToCart = () => {
     addToCart({
@@ -58,7 +85,7 @@ export function ProductCard({
             </div>
           )}
           
-          <div className="aspect-square bg-gradient-to-br from-secondary to-primary/5 relative overflow-hidden ring-2 ring-primary/20 group-hover:ring-primary/40 transition-all duration-300">
+          <ImageFrame href={href} name={name}>
             <Image
               src={image}
               alt={name}
@@ -67,7 +94,7 @@ export function ProductCard({
             />
             {/* Hover Overlay */}
             <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-          </div>
+          </ImageFrame>
         </div>
 
         {/* Content Container */}
@@ -81,7 +108,13 @@ export function ProductCard({
 
           {/* Product Name */}
           <h3 className="text-lg font-light tracking-wide text-foreground line-clamp-2 group-hover:text-primary transition-colors duration-300">
-            {name}
+            {href ? (
+              <Link href={href} className="hover:underline">
+                {name}
+              </Link>
+            ) : (
+              name
+            )}
           </h3>
 
           {/* Rating and Reviews */}
@@ -115,6 +148,17 @@ export function ProductCard({
               </p>
             )}
           </div>
+
+          {/* View Details */}
+          {href && (
+            <Link
+              href={href}
+              className="inline-flex items-center gap-1.5 text-sm font-light text-primary transition-colors hover:text-foreground w-fit"
+            >
+              View Details
+              <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
+            </Link>
+          )}
 
           {/* Quick Add Button */}
           <button 
