@@ -50,9 +50,7 @@
     ],
     "ingredients": "Aqua, Shea Butter, Glycerin, Urea, Cetearyl Alcohol, Sweet Almond Oil, Tocopheryl Acetate (Vitamin E), Allantoin, Panthenol, Fragrance",
     "gallery": [
-      "/clour.jpg",
-      "/product-package.jpg",
-      "/hero-img.jpg"
+      "/clour.jpg"
     ],
     "faqs": [
       {
@@ -124,9 +122,8 @@
     "ingredients": "Serum: Aqua, Sodium Ascorbyl Phosphate (Vitamin C), Pearl Powder Extract, Niacinamide, Glycerin, Sodium Hyaluronate, Licorice Root Extract. Cream: Aqua, Persea Gratissima (Avocado) Oil, Milk Protein Extract, Glycerin, Cetearyl Alcohol, Tocopheryl Acetate, Allantoin, Fragrance",
     "gallery": [
       "/com.png",
-      "/serum.jpg",
-      "/bri.png",
-      "/product-package.jpg"
+      "/product-package.jpg",
+      "/serum.jpg"
     ],
     "faqs": [
       {
@@ -278,7 +275,6 @@
     "gallery": [
       "/bri.png",
       "/serum.jpg",
-      "/beauty-soap.jpg",
       "/product-package.jpg"
     ],
     "faqs": [
@@ -422,8 +418,7 @@
     "ingredients": "Aqua, Glycerin, Niacinamide, Shea Butter, Prunus Amygdalus Dulcis (Sweet Almond) Oil, Cetearyl Alcohol, Licorice Root Extract, Tocopheryl Acetate, Allantoin, Fragrance",
     "gallery": [
       "/fifth.png",
-      "/lotion-pack.jpg",
-      "/product-package.jpg"
+      "/lotion-pack.jpg"
     ],
     "faqs": [
       {
@@ -495,8 +490,7 @@
     "gallery": [
       "/comsix.png",
       "/serum.jpg",
-      "/about-serum.jpg",
-      "/bridal-pack.jpg"
+      "/about-serum.jpg"
     ],
     "faqs": [
       {
@@ -643,8 +637,7 @@
     "ingredients": "Sodium Palmate, Sodium Palm Kernelate, Aqua, Milk Cream, Glycerin, Cocos Nucifera (Coconut) Oil, Tocopheryl Acetate, Titanium Dioxide, Fragrance",
     "gallery": [
       "/soap-pack.jpg",
-      "/beauty-soap.jpg",
-      "/product-package.jpg"
+      "/beauty-soap.jpg"
     ],
     "faqs": [
       {
@@ -716,8 +709,7 @@
     "gallery": [
       "/face-wash-cream.jpg",
       "/face-wash-single.jpg",
-      "/com.png",
-      "/product-package.jpg"
+      "/comsix.png"
     ],
     "faqs": [
       {

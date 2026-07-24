@@ -22,13 +22,15 @@ import { dirname, join } from 'node:path'
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
 const uri = process.env.MONGODB_URI
-const dbName = process.env.MONGODB_DB || 'skincare'
+// Must match the database the app reads from in lib/mongodb.ts.
+const dbName = process.env.MONGODB_DB || 'colorwhite'
 
 const args = new Set(process.argv.slice(2))
 const shouldReset = args.has('--reset')
 const isDryRun = args.has('--dry')
 
-if (!uri) {
+// A dry run only reads the local JSON export, so it does not need a connection.
+if (!uri && !isDryRun) {
   console.error('\n  Missing MONGODB_URI.\n')
   console.error('  Example:')
   console.error('    MONGODB_URI="mongodb+srv://user:pass@cluster/" node scripts/seed-products.mjs\n')
@@ -72,10 +74,7 @@ async function main() {
       console.log(`  Reset: removed ${deletedCount} existing products`)
     }
 
-    // Unique indexes keep productId/slug collisions out of the catalog and make
-    // the detail-page slug lookup fast.
     await collection.createIndex({ productId: 1 }, { unique: true })
-    await collection.createIndex({ slug: 1 }, { unique: true })
 
     const operations = products.map((product) => ({
       updateOne: {
@@ -89,6 +88,19 @@ async function main() {
     }))
 
     const result = await collection.bulkWrite(operations, { ordered: false })
+
+    // Created after the upserts so the documents already carry slugs. The
+    // partial filter means any legacy product still missing a slug does not
+    // collide with other slug-less documents in the unique index.
+    await collection.createIndex(
+      { slug: 1 },
+      { unique: true, partialFilterExpression: { slug: { $type: 'string' } } },
+    )
+
+    const missingSlug = await collection.countDocuments({ slug: { $not: { $type: 'string' } } })
+    if (missingSlug > 0) {
+      console.log(`  Note: ${missingSlug} product(s) have no slug and won't have a detail page.`)
+    }
 
     console.log(`  Inserted: ${result.upsertedCount}`)
     console.log(`  Updated:  ${result.modifiedCount}`)
