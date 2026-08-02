@@ -5,6 +5,7 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Switch } from '@/components/ui/switch'
 import { SectionCard, useSiteSettings } from '@/components/admin/settings-section'
+import { ImageUploadField } from '@/components/admin/image-upload'
 
 export default function AdminContentPage() {
   const { data, mutate } = useSiteSettings()
@@ -45,16 +46,15 @@ export default function AdminContentPage() {
                 onChange={(e) => setDraft({ ...draft, description: e.target.value })}
               />
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div className="flex flex-col gap-2">
-                <Label htmlFor="hero-image">Image Path</Label>
-                <Input
-                  id="hero-image"
-                  value={draft.image}
-                  onChange={(e) => setDraft({ ...draft, image: e.target.value })}
-                  placeholder="/hero-img.jpg"
-                />
-              </div>
+            <ImageUploadField
+              id="hero-image"
+              label="Hero Image"
+              folder="content"
+              value={draft.image}
+              onChange={(url) => setDraft({ ...draft, image: url })}
+              placeholder="/hero-img.jpg"
+            />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="flex flex-col gap-2">
                 <Label htmlFor="hero-btn-text">Button Text</Label>
                 <Input
@@ -208,14 +208,14 @@ export default function AdminContentPage() {
                 onChange={(e) => setDraft({ ...draft, message: e.target.value })}
               />
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div className="flex flex-col gap-2">
-                <Label>Image Path</Label>
-                <Input
-                  value={draft.image}
-                  onChange={(e) => setDraft({ ...draft, image: e.target.value })}
-                />
-              </div>
+            <ImageUploadField
+              id="promo-image"
+              label="Popup Image"
+              folder="content"
+              value={draft.image}
+              onChange={(url) => setDraft({ ...draft, image: url })}
+            />
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className="flex flex-col gap-2">
                 <Label>Button Text</Label>
                 <Input
