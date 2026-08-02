@@ -42,6 +42,7 @@ import { toast } from 'sonner'
 import { Toaster } from '@/components/ui/sonner'
 import { Plus, Pencil, Trash2, Loader2, ExternalLink } from 'lucide-react'
 import { StringListField, PairListField } from '@/components/admin/list-fields'
+import { ImageUploadField, ImageListUploadField } from '@/components/admin/image-upload'
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json())
 
@@ -415,12 +416,14 @@ export default function AdminProductsPage() {
                     onChange={(e) => setField('originalPrice', e.target.value)}
                   />
                 </div>
-                <div className="sm:col-span-2 flex flex-col gap-2">
-                  <Label htmlFor="p-image">Main image path or URL</Label>
-                  <Input
+                <div className="sm:col-span-2">
+                  <ImageUploadField
                     id="p-image"
+                    label="Main image"
+                    hint="Shown on the shop grid and at the top of the detail page. Upload a file or paste an existing path."
+                    folder="products"
                     value={form.image}
-                    onChange={(e) => setField('image', e.target.value)}
+                    onChange={(url) => setField('image', url)}
                     placeholder="/clour.jpg or https://..."
                   />
                 </div>
@@ -553,11 +556,10 @@ export default function AdminProductsPage() {
                     placeholder="Comma separated ingredient list"
                   />
                 </div>
-                <StringListField
+                <ImageListUploadField
                   label="Gallery images"
                   hint="Extra images shown as thumbnails. The main image is added automatically."
-                  itemLabel="Image"
-                  placeholder="/serum.jpg"
+                  folder="products"
                   values={form.gallery}
                   onChange={(v) => setField('gallery', v)}
                 />
