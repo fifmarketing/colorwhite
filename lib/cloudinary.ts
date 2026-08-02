@@ -98,27 +98,33 @@ function mapResource(resource: RawResource): CloudinaryImage {
   }
 }
 
-/** List images in the project folder, newest first. */
+/**
+ * List images in the project folder, newest first.
+ *
+ * Uses the Admin API `prefix` listing rather than the Search API on purpose:
+ * on accounts using dynamic folders the asset's path lives in `asset_folder`
+ * and the Search API's `folder:` term matches nothing, so a search-based
+ * listing silently returns an empty media library. Prefix matching against
+ * `public_id` is reliable across both folder modes.
+ */
 export async function listImages(
   config: CloudinaryConfig,
   options: { folder?: string; limit?: number } = {}
 ): Promise<CloudinaryImage[]> {
-  const prefix = options.folder ? resolveFolder(options.folder) : DEFAULT_UPLOAD_FOLDER
+  const prefix = options.folder
+    ? `${resolveFolder(options.folder)}/`
+    : `${DEFAULT_UPLOAD_FOLDER}/`
+
+  const query = new URLSearchParams({
+    type: 'upload',
+    prefix,
+    max_results: String(Math.min(options.limit ?? 60, 100)),
+    direction: 'desc',
+  })
+
   const res = await fetch(
-    `https://api.cloudinary.com/v1_1/${config.cloudName}/resources/search`,
-    {
-      method: 'POST',
-      headers: {
-        Authorization: authHeader(config),
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        expression: `resource_type:image AND folder:${prefix}/*`,
-        sort_by: [{ created_at: 'desc' }],
-        max_results: Math.min(options.limit ?? 60, 100),
-      }),
-      cache: 'no-store',
-    }
+    `https://api.cloudinary.com/v1_1/${config.cloudName}/resources/image/upload?${query.toString()}`,
+    { headers: { Authorization: authHeader(config) }, cache: 'no-store' }
   )
 
   if (!res.ok) {
