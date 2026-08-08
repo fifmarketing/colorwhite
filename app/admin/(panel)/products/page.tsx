@@ -53,6 +53,9 @@ import { ImageUploadField, ImageListUploadField } from '@/components/admin/image
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json())
 
+/** Sentinel value for the "add new category" option in the category select. */
+const NEW_CATEGORY = '__new__'
+
 interface Feature {
   title: string
   desc: string
@@ -139,12 +142,14 @@ export default function AdminProductsPage() {
   const openCreate = () => {
     setEditing(null)
     setForm(emptyForm)
+    setNewCategory(true)
     setTab('basics')
     setDialogOpen(true)
   }
 
   const openEdit = (product: Product) => {
     setEditing(product)
+    setNewCategory(false)
     setForm({
       name: product.name,
       slug: product.slug ?? '',

@@ -1167,7 +1167,7 @@ A flat delivery charge of Rs. 200 applies to all orders. Delivery is free on ord
 Once you place an order, our team confirms it on WhatsApp or by phone. Please keep your phone available so your parcel is not delayed or returned. Orders placed on Sundays and public holidays are processed on the next working day.
 
 ## Tracking
-As soon as your parcel is dispatched, we share the courier tracking number with you on WhatsApp. You can also check your order status any time on our Track Order page.
+As soon as your parcel is dispatched, we share the courier tracking number with you on WhatsApp. You can also message us your order number any time and we will check the status for you.
 
 ## Failed Deliveries
 If the courier is unable to reach you after multiple attempts, the parcel is returned to us. You can request a re-delivery, though additional delivery charges may apply.`,
@@ -1298,7 +1298,7 @@ Color White Cosmetics is not liable for any indirect loss arising from the use o
         category: 'Delivery',
         question: 'How can I track my parcel?',
         answer:
-          'We share your courier tracking number on WhatsApp as soon as the parcel is dispatched. You can also check the status on our Track Order page using your order number.',
+          'We share your courier tracking number on WhatsApp as soon as the parcel is dispatched. You can also message us your order number any time and we will check the status for you.',
       },
       {
         category: 'Product Usage',
