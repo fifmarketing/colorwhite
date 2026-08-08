@@ -856,9 +856,42 @@ export interface TestimonialDoc {
   rating: number
   active: boolean
   sortOrder: number
+  /** Optional WhatsApp screenshot. Client blurs sender details before uploading. */
+  image?: string
+  /** Links the review to a product detail page when set. */
+  productSlug?: string
+  city?: string
+  source?: 'whatsapp' | 'website'
+  verified?: boolean
+  dateLabel?: string
+}
+
+export type TopBarIcon = 'cod' | 'truck' | 'whatsapp' | 'shield'
+
+export interface HeroSlide {
+  title: string
+  description: string
+  image: string
+  buttonText: string
+  buttonLink: string
+}
+
+export interface PolicyContent {
+  title: string
+  intro: string
+  /** Plain text. Blank lines split paragraphs, "## " makes a heading, "- " makes a list item. */
+  body: string
 }
 
 export interface SiteSettings {
+  topBar: {
+    enabled: boolean
+    items: { icon: TopBarIcon; text: string }[]
+  }
+  heroSlides: {
+    autoplaySeconds: number
+    slides: HeroSlide[]
+  }
   hero: {
     title: string
     description: string
@@ -920,12 +953,58 @@ export interface SiteSettings {
     instagramUrl: string
     facebookUrl: string
     copyrightText: string
+    aboutText: string
+    phone: string
+    whatsapp: string
+    address: string
+    hours: string
+    tiktokUrl: string
+    youtubeUrl: string
+    showPaymentBadges: boolean
   }
   whatsapp: {
     phoneNumber: string
   }
   checkout: {
     shippingCost: number
+    freeShippingThreshold: number
+    deliveryEstimate: string
+    shippingNote: string
+  }
+  payment: {
+    codEnabled: boolean
+    codLabel: string
+    codDescription: string
+    bankEnabled: boolean
+    bankLabel: string
+    bankName: string
+    accountTitle: string
+    accountNumber: string
+    iban: string
+    bankInstructions: string
+    requireProof: boolean
+  }
+  policies: {
+    shipping: PolicyContent
+    returns: PolicyContent
+    privacy: PolicyContent
+    terms: PolicyContent
+  }
+  faqs: {
+    title: string
+    subtitle: string
+    items: { category: string; question: string; answer: string }[]
+  }
+  reviewsPage: {
+    eyebrow: string
+    title: string
+    subtitle: string
+    note: string
+  }
+  categoriesPage: {
+    eyebrow: string
+    title: string
+    subtitle: string
   }
   seo: {
     siteTitle: string
@@ -934,6 +1013,18 @@ export interface SiteSettings {
 }
 
 export const defaultSettings: SiteSettings = {
+  topBar: {
+    enabled: true,
+    items: [
+      { icon: 'cod', text: 'Cash on Delivery Available Across Pakistan' },
+      { icon: 'truck', text: 'Delivery in 3 to 5 Working Days' },
+      { icon: 'whatsapp', text: 'Need Help? WhatsApp Us: +92 340 4476857' },
+    ],
+  },
+  heroSlides: {
+    autoplaySeconds: 6,
+    slides: [],
+  },
   hero: {
     title: 'Color White Beauty Cream',
     description:
@@ -1025,12 +1116,245 @@ export const defaultSettings: SiteSettings = {
     instagramUrl: 'https://www.instagram.com/colorwhitecosmetics/',
     facebookUrl: 'https://web.facebook.com/ColorWhiteBeautyCream',
     copyrightText: 'Copyright © 2026 Color White Beauty',
+    aboutText:
+      'Color White Cosmetics is a proudly Pakistani skincare brand offering premium quality products for healthy, glowing skin — delivered across Pakistan with Cash on Delivery.',
+    phone: '+92 300 7222669',
+    whatsapp: '+923404476857',
+    address: '10-H Afghani Road, Samanabad, Lahore, 54000, Punjab, Pakistan',
+    hours: 'Mon – Sat | 10:00 AM – 7:00 PM',
+    tiktokUrl: '',
+    youtubeUrl: '',
+    showPaymentBadges: true,
   },
   whatsapp: {
     phoneNumber: '+923404476857',
   },
   checkout: {
     shippingCost: 200,
+    freeShippingThreshold: 3000,
+    deliveryEstimate: '3 to 5 working days',
+    shippingNote: 'Shipping charges are calculated at checkout.',
+  },
+  payment: {
+    codEnabled: true,
+    codLabel: 'Cash on Delivery',
+    codDescription: 'Pay in cash when your parcel arrives at your doorstep.',
+    bankEnabled: true,
+    bankLabel: 'Bank Transfer',
+    bankName: 'Meezan Bank',
+    accountTitle: 'SHAHID SHOUKAT',
+    accountNumber: '11480110547021',
+    iban: 'PK45MEZN0011480110547021',
+    bankInstructions:
+      'Transfer the total amount to the account above, then upload your payment screenshot below. Your order is confirmed once we verify the payment.',
+    requireProof: true,
+  },
+  policies: {
+    shipping: {
+      title: 'Shipping Policy',
+      intro:
+        'Everything you need to know about where we deliver, how long it takes and what it costs.',
+      body: `## Delivery Areas
+We deliver to all major cities and towns across Pakistan, including Lahore, Karachi, Islamabad, Rawalpindi, Faisalabad, Multan, Peshawar, Quetta, Sialkot and Gujranwala. If your area is served by our courier partners, we can deliver to you.
+
+## Delivery Time
+Orders are dispatched within 1 working day of confirmation. Delivery normally takes 3 to 5 working days depending on your location. Remote areas may take 1 to 2 additional days.
+
+## Shipping Charges
+A flat delivery charge of Rs. 200 applies to all orders. Delivery is free on orders above Rs. 3,000. Charges are always shown on the checkout page before you place your order.
+
+## Order Processing
+Once you place an order, our team confirms it on WhatsApp or by phone. Please keep your phone available so your parcel is not delayed or returned. Orders placed on Sundays and public holidays are processed on the next working day.
+
+## Tracking
+As soon as your parcel is dispatched, we share the courier tracking number with you on WhatsApp. You can also check your order status any time on our Track Order page.
+
+## Failed Deliveries
+If the courier is unable to reach you after multiple attempts, the parcel is returned to us. You can request a re-delivery, though additional delivery charges may apply.`,
+    },
+    returns: {
+      title: 'Return and Exchange Policy',
+      intro: 'We want you to be happy with your order. Here is how returns and exchanges work.',
+      body: `## Return Eligibility
+You may request a return or exchange within 7 days of receiving your order, provided the product is unused, unopened and in its original packaging with the seal intact.
+
+## Damaged or Incorrect Items
+If your product arrives damaged, leaking or you received the wrong item, contact us on WhatsApp within 48 hours of delivery with photos or a short video of the parcel and product. We will replace it free of charge.
+
+## Non-Returnable Items
+For hygiene and safety reasons we cannot accept returns on opened or used skincare products, or on items that have been damaged after delivery.
+
+## Exchange Process
+- Message us on WhatsApp with your order number and the reason for the exchange.
+- Our team confirms whether your request is eligible.
+- Send the product back in its original packaging, or hand it over to the courier we arrange.
+- Once we receive and inspect the item, we dispatch the replacement.
+
+## Refunds
+Where a replacement is not possible, we issue a refund through bank transfer or easypaisa/JazzCash within 5 to 7 working days of receiving the returned item. Original delivery charges are non-refundable unless the fault was ours.
+
+## Order Cancellation
+You can cancel an order free of charge any time before it is dispatched. Once the parcel is with the courier, cancellation is treated as a return.`,
+    },
+    privacy: {
+      title: 'Privacy Policy',
+      intro: 'How Color White Cosmetics collects, uses and protects your information.',
+      body: `## Information We Collect
+When you place an order or contact us, we collect your name, phone number, delivery address, and optionally your email address. If you pay by bank transfer, we also collect the payment screenshot or reference number you provide.
+
+## How We Use Your Information
+Your information is used only to process and deliver your order, to confirm it on WhatsApp or by phone, to handle returns and support requests, and — if you agree — to inform you about offers and new products.
+
+## Cookies
+Our website uses cookies and local browser storage to keep your cart and favourites saved between visits and to understand how the site is used. You can clear or block cookies in your browser settings, though some features may stop working.
+
+## Third Parties
+We share only the details required for delivery with our courier partners, and payment references with our bank. We do not sell, rent or trade your personal information with anyone else.
+
+## Data Security
+Order data is stored securely and access is limited to authorised team members. While no online system can be guaranteed to be perfectly secure, we take reasonable steps to protect your information.
+
+## Your Rights
+You may ask us to review, correct or delete the personal information we hold about you, or to stop sending you promotional messages. Contact us on WhatsApp or by email and we will action your request.`,
+    },
+    terms: {
+      title: 'Terms and Conditions',
+      intro: 'The terms that apply when you use this website and order from us.',
+      body: `## Use of This Website
+By browsing or ordering from colorwhitecosmetics.pk you agree to these terms. All content, images and text on this website belong to Color White Cosmetics and may not be copied or reused without permission.
+
+## Orders
+Placing an order is an offer to purchase. An order is confirmed only after our team verifies it on WhatsApp or by phone. We reserve the right to decline or cancel any order, including where a product is out of stock or the delivery details are incomplete.
+
+## Pricing
+All prices are shown in Pakistani Rupees (PKR) and include applicable taxes. Delivery charges are shown separately at checkout. We may change prices and offers at any time, but changes never affect orders that are already confirmed.
+
+## Cash on Delivery
+For Cash on Delivery orders, the full amount must be paid to the courier at the time of delivery. Please keep the exact amount ready. Repeatedly refusing confirmed COD parcels may result in COD being disabled for your number.
+
+## Bank Transfer
+For bank transfer orders, your order is processed after payment is received and verified. Please upload your payment screenshot or share the transaction reference so we can match it to your order.
+
+## Product Disclaimer
+Our products are cosmetic skincare products, not medicines. Results vary from person to person. Always patch test before first use and discontinue use if irritation occurs. Consult a dermatologist if you have a known skin condition or allergy.
+
+## Limitation of Liability
+Color White Cosmetics is not liable for any indirect loss arising from the use of this website or our products beyond the value of the product purchased.`,
+    },
+  },
+  faqs: {
+    title: 'Frequently Asked Questions',
+    subtitle: 'Answers to the questions our customers ask most. Still stuck? Message us on WhatsApp.',
+    items: [
+      {
+        category: 'Ordering',
+        question: 'How do I place an order?',
+        answer:
+          'Add the products you want to your cart, open the cart and press Checkout. Fill in your name, phone number and complete address, choose a payment method and confirm. Our team will contact you on WhatsApp to verify the order.',
+      },
+      {
+        category: 'Ordering',
+        question: 'Can I order without creating an account?',
+        answer:
+          'Yes. No account is needed — you only need to provide your name, phone number and delivery address at checkout.',
+      },
+      {
+        category: 'Ordering',
+        question: 'Can I change or cancel my order?',
+        answer:
+          'You can change or cancel your order free of charge any time before it is dispatched. Just message us on WhatsApp with your order number.',
+      },
+      {
+        category: 'Payment',
+        question: 'What payment methods do you accept?',
+        answer:
+          'We accept Cash on Delivery across Pakistan and direct bank transfer to our Meezan Bank account. Bank details are shown at checkout when you select Bank Transfer.',
+      },
+      {
+        category: 'Payment',
+        question: 'Is Cash on Delivery available in my city?',
+        answer:
+          'Cash on Delivery is available in all areas covered by our courier partners, which includes every major city and most towns in Pakistan.',
+      },
+      {
+        category: 'Payment',
+        question: 'How do I confirm a bank transfer?',
+        answer:
+          'After transferring the amount, upload your payment screenshot at checkout or send it to us on WhatsApp along with your order number. We confirm your order once the payment is verified.',
+      },
+      {
+        category: 'Delivery',
+        question: 'How long does delivery take?',
+        answer:
+          'Orders are dispatched within 1 working day and normally reach you in 3 to 5 working days. Remote areas may take slightly longer.',
+      },
+      {
+        category: 'Delivery',
+        question: 'What are the delivery charges?',
+        answer:
+          'A flat charge of Rs. 200 applies to all orders, and delivery is free on orders above Rs. 3,000.',
+      },
+      {
+        category: 'Delivery',
+        question: 'How can I track my parcel?',
+        answer:
+          'We share your courier tracking number on WhatsApp as soon as the parcel is dispatched. You can also check the status on our Track Order page using your order number.',
+      },
+      {
+        category: 'Product Usage',
+        question: 'Are your products safe for sensitive skin?',
+        answer:
+          'Our formulations are gentle and suitable for most skin types, but every skin is different. We recommend a patch test behind the ear or on the inner arm before first use.',
+      },
+      {
+        category: 'Product Usage',
+        question: 'How long until I see results?',
+        answer:
+          'Most customers notice brighter, smoother skin within 2 to 3 weeks of consistent use, morning and night. Results vary from person to person.',
+      },
+      {
+        category: 'Product Usage',
+        question: 'Are your products original?',
+        answer:
+          'Yes. Every product is 100% original and shipped directly from Color White Cosmetics — never through third-party resellers.',
+      },
+      {
+        category: 'Returns and Exchanges',
+        question: 'What if my product arrives damaged?',
+        answer:
+          'Send us photos or a short video within 48 hours of delivery on WhatsApp and we will replace the damaged product free of charge.',
+      },
+      {
+        category: 'Returns and Exchanges',
+        question: 'Can I return a product I have already opened?',
+        answer:
+          'For hygiene reasons we cannot accept returns on opened or used skincare products, unless the item was damaged or incorrect on arrival.',
+      },
+      {
+        category: 'Other Questions',
+        question: 'Do you offer wholesale or reseller pricing?',
+        answer:
+          'Yes, we work with resellers across Pakistan. Message us on WhatsApp with your city and expected quantity and our team will share wholesale rates.',
+      },
+      {
+        category: 'Other Questions',
+        question: 'How do I contact customer support?',
+        answer:
+          'WhatsApp is the fastest way to reach us. You can also call us or use the form on our Contact Us page. We reply Monday to Saturday, 10:00 AM to 7:00 PM.',
+      },
+    ],
+  },
+  reviewsPage: {
+    eyebrow: 'Real feedback',
+    title: 'What Our *Customers* Say',
+    subtitle:
+      'Genuine messages and screenshots shared by customers across Pakistan after using Color White products.',
+    note: 'Sender names and numbers are blurred to protect our customers’ privacy.',
+  },
+  categoriesPage: {
+    eyebrow: 'Browse',
+    title: 'Shop by *Category*',
+    subtitle: 'Find the right routine faster by exploring our products category by category.',
   },
   seo: {
     siteTitle: 'Color White Beauty | Premium Skincare Collection',

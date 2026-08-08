@@ -32,11 +32,28 @@ function mergeSettings(stored: Partial<SiteSettings> | null): SiteSettings {
       merged[key] = storedSection
     }
   }
-  return merged as unknown as SiteSettings
+  return withHeroSlideFallback(merged as unknown as SiteSettings)
+}
+
+/**
+ * The homepage now renders a slider. Databases that only have the legacy single
+ * `hero` object get it promoted to slide 1 so nothing looks different until the
+ * client adds more slides in the admin panel.
+ */
+function withHeroSlideFallback(settings: SiteSettings): SiteSettings {
+  const slides = settings.heroSlides?.slides
+  if (Array.isArray(slides) && slides.length > 0) return settings
+  return {
+    ...settings,
+    heroSlides: {
+      autoplaySeconds: settings.heroSlides?.autoplaySeconds ?? 6,
+      slides: [{ ...settings.hero }],
+    },
+  }
 }
 
 export async function getSettings(): Promise<SiteSettings> {
-  if (!isDbConfigured) return defaultSettings
+  if (!isDbConfigured) return withHeroSlideFallback(defaultSettings)
   try {
     const db = await getDb()
     const doc = await db.collection('settings').findOne({ key: 'site' })
@@ -48,13 +65,13 @@ export async function getSettings(): Promise<SiteSettings> {
           { $setOnInsert: { key: 'site', ...defaultSettings } },
           { upsert: true }
         )
-      return defaultSettings
+      return withHeroSlideFallback(defaultSettings)
     }
     const { _id, key, ...rest } = doc as Record<string, unknown>
     return mergeSettings(rest as Partial<SiteSettings>)
   } catch (error) {
     console.error('[v0] getSettings failed, using defaults:', error)
-    return defaultSettings
+    return withHeroSlideFallback(defaultSettings)
   }
 }
 
@@ -223,20 +240,55 @@ export async function getRelatedProducts(product: Product, limit = 3): Promise<P
   return [...sameCategory, ...rest].slice(0, limit)
 }
 
+/**
+ * Guarantees the optional review fields (screenshot, product link, city…) are
+ * always present so components never branch on `undefined`.
+ */
+export function normalizeTestimonial(raw: Record<string, unknown>, id: string): Testimonial {
+  const doc = raw as unknown as Partial<TestimonialDoc>
+  return {
+    _id: id,
+    name: String(doc.name ?? ''),
+    text: String(doc.text ?? ''),
+    rating: Number(doc.rating ?? 5),
+    active: doc.active !== false,
+    sortOrder: Number(doc.sortOrder ?? 0),
+    image: typeof doc.image === 'string' ? doc.image : '',
+    productSlug: typeof doc.productSlug === 'string' ? doc.productSlug : '',
+    city: typeof doc.city === 'string' ? doc.city : '',
+    source: doc.source === 'whatsapp' ? 'whatsapp' : 'website',
+    verified: doc.verified === true,
+    dateLabel: typeof doc.dateLabel === 'string' ? doc.dateLabel : '',
+  }
+}
+
+function fallbackTestimonials(): Testimonial[] {
+  return defaultTestimonials.map((t, i) =>
+    normalizeTestimonial(t as unknown as Record<string, unknown>, `default-${i}`)
+  )
+}
+
 export async function getTestimonials(options?: {
   includeInactive?: boolean
 }): Promise<Testimonial[]> {
-  if (!isDbConfigured) return defaultTestimonials.map((t, i) => ({ ...t, _id: `default-${i}` }))
+  if (!isDbConfigured) return fallbackTestimonials()
   try {
     await ensureTestimonialsSeeded()
     const db = await getDb()
     const filter = options?.includeInactive ? {} : { active: { $ne: false } }
     const docs = await db.collection('testimonials').find(filter).sort({ sortOrder: 1 }).toArray()
-    return docs.map((d) => ({ ...(d as unknown as TestimonialDoc), _id: d._id.toString() }))
+    return docs.map((d) => normalizeTestimonial(d as Record<string, unknown>, d._id.toString()))
   } catch (error) {
     console.error('[v0] getTestimonials failed, using defaults:', error)
-    return defaultTestimonials.map((t, i) => ({ ...t, _id: `default-${i}` }))
+    return fallbackTestimonials()
   }
+}
+
+/** Active reviews attached to a specific product detail page. */
+export async function getTestimonialsForProduct(slug: string): Promise<Testimonial[]> {
+  if (!slug) return []
+  const all = await getTestimonials()
+  return all.filter((t) => t.productSlug === slug)
 }
 
 async function ensureTestimonialsSeeded() {

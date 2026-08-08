@@ -1,11 +1,14 @@
 'use client'
 
+import { ChevronDown, ChevronUp, Plus, Trash2 } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Switch } from '@/components/ui/switch'
 import { SectionCard, useSiteSettings } from '@/components/admin/settings-section'
 import { ImageUploadField } from '@/components/admin/image-upload'
+import type { HeroSlide } from '@/lib/default-content'
 
 export default function AdminContentPage() {
   const { data, mutate } = useSiteSettings()
@@ -22,7 +25,161 @@ export default function AdminContentPage() {
       </div>
 
       <SectionCard
-        title="Hero Section"
+        title="Home Slider"
+        description="Slides shown at the top of the homepage. Add two or more slides to enable the rotating slider — with a single slide it stays a static hero."
+        section="heroSlides"
+        initial={settings?.heroSlides}
+        onSaved={() => mutate()}
+      >
+        {(draft, setDraft) => {
+          const slides = draft.slides ?? []
+          const updateSlide = (index: number, patch: Partial<HeroSlide>) =>
+            setDraft({
+              ...draft,
+              slides: slides.map((slide, i) => (i === index ? { ...slide, ...patch } : slide)),
+            })
+          const move = (index: number, direction: -1 | 1) => {
+            const target = index + direction
+            if (target < 0 || target >= slides.length) return
+            const next = [...slides]
+            ;[next[index], next[target]] = [next[target], next[index]]
+            setDraft({ ...draft, slides: next })
+          }
+
+          return (
+            <div className="flex flex-col gap-6">
+              <div className="flex flex-col gap-2 sm:max-w-[220px]">
+                <Label htmlFor="slider-autoplay">Autoplay (seconds)</Label>
+                <Input
+                  id="slider-autoplay"
+                  type="number"
+                  min={0}
+                  value={draft.autoplaySeconds}
+                  onChange={(e) =>
+                    setDraft({ ...draft, autoplaySeconds: Number(e.target.value) || 0 })
+                  }
+                />
+                <p className="text-xs text-muted-foreground">Set to 0 to disable autoplay.</p>
+              </div>
+
+              {slides.length === 0 && (
+                <p className="text-sm text-muted-foreground">
+                  No slides yet. Add one to control the homepage hero.
+                </p>
+              )}
+
+              {slides.map((slide, index) => (
+                <div key={index} className="rounded-lg border border-border p-4 flex flex-col gap-4">
+                  <div className="flex items-center justify-between gap-3">
+                    <p className="text-sm font-medium text-foreground">Slide {index + 1}</p>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="icon"
+                        aria-label="Move slide up"
+                        disabled={index === 0}
+                        onClick={() => move(index, -1)}
+                      >
+                        <ChevronUp className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="icon"
+                        aria-label="Move slide down"
+                        disabled={index === slides.length - 1}
+                        onClick={() => move(index, 1)}
+                      >
+                        <ChevronDown className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="icon"
+                        aria-label="Delete slide"
+                        onClick={() =>
+                          setDraft({ ...draft, slides: slides.filter((_, i) => i !== index) })
+                        }
+                      >
+                        <Trash2 className="w-4 h-4 text-destructive" />
+                      </Button>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col gap-2">
+                    <Label>Title</Label>
+                    <Input
+                      value={slide.title}
+                      onChange={(e) => updateSlide(index, { title: e.target.value })}
+                    />
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <Label>Description</Label>
+                    <Textarea
+                      rows={3}
+                      value={slide.description}
+                      onChange={(e) => updateSlide(index, { description: e.target.value })}
+                    />
+                  </div>
+                  <ImageUploadField
+                    id={`slide-image-${index}`}
+                    label="Slide Image"
+                    folder="content"
+                    value={slide.image}
+                    onChange={(url) => updateSlide(index, { image: url })}
+                    placeholder="/hero-img.jpg"
+                  />
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="flex flex-col gap-2">
+                      <Label>Button Text</Label>
+                      <Input
+                        value={slide.buttonText}
+                        onChange={(e) => updateSlide(index, { buttonText: e.target.value })}
+                      />
+                    </div>
+                    <div className="flex flex-col gap-2">
+                      <Label>Button Link</Label>
+                      <Input
+                        value={slide.buttonLink}
+                        onChange={(e) => updateSlide(index, { buttonLink: e.target.value })}
+                      />
+                    </div>
+                  </div>
+                </div>
+              ))}
+
+              <Button
+                type="button"
+                variant="outline"
+                className="self-start"
+                onClick={() =>
+                  setDraft({
+                    ...draft,
+                    slides: [
+                      ...slides,
+                      {
+                        title: '',
+                        description: '',
+                        image: '',
+                        buttonText: 'Shop Now',
+                        buttonLink: '/shop',
+                      },
+                    ],
+                  })
+                }
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Add Slide
+              </Button>
+            </div>
+          )
+        }}
+      </SectionCard>
+
+      <SectionCard
+        title="Hero Section (legacy fallback)"
+        description="Used only when the Home Slider has no slides."
         section="hero"
         initial={settings?.hero}
         onSaved={() => mutate()}
