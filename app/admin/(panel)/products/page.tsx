@@ -38,6 +38,13 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { toast } from 'sonner'
 import { Toaster } from '@/components/ui/sonner'
 import { Plus, Pencil, Trash2, Loader2, ExternalLink } from 'lucide-react'
@@ -45,6 +52,9 @@ import { StringListField, PairListField } from '@/components/admin/list-fields'
 import { ImageUploadField, ImageListUploadField } from '@/components/admin/image-upload'
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json())
+
+/** Sentinel value for the "add new category" option in the category select. */
+const NEW_CATEGORY = '__new__'
 
 interface Feature {
   title: string
@@ -122,16 +132,24 @@ export default function AdminProductsPage() {
   const [tab, setTab] = useState('basics')
   const [saving, setSaving] = useState(false)
   const [deleteTarget, setDeleteTarget] = useState<Product | null>(null)
+  const [newCategory, setNewCategory] = useState(false)
+
+  // Existing category labels, so the client reuses them instead of typing variants.
+  const categoryOptions = [
+    ...new Set(products.map((p) => (p.category || '').trim()).filter(Boolean)),
+  ].sort((a, b) => a.localeCompare(b))
 
   const openCreate = () => {
     setEditing(null)
     setForm(emptyForm)
+    setNewCategory(true)
     setTab('basics')
     setDialogOpen(true)
   }
 
   const openEdit = (product: Product) => {
     setEditing(product)
+    setNewCategory(false)
     setForm({
       name: product.name,
       slug: product.slug ?? '',
@@ -390,13 +408,42 @@ export default function AdminProductsPage() {
                   </p>
                 </div>
                 <div className="sm:col-span-2 flex flex-col gap-2">
-                  <Label htmlFor="p-category">Category label</Label>
-                  <Input
-                    id="p-category"
-                    value={form.category}
-                    onChange={(e) => setField('category', e.target.value)}
-                    placeholder="e.g. HAND & FOOT CARE"
-                  />
+                  <Label htmlFor="p-category">Category</Label>
+                  <Select
+                    value={newCategory || !form.category ? NEW_CATEGORY : form.category}
+                    onValueChange={(value) => {
+                      if (value === NEW_CATEGORY) {
+                        setNewCategory(true)
+                        setField('category', '')
+                      } else {
+                        setNewCategory(false)
+                        setField('category', value)
+                      }
+                    }}
+                  >
+                    <SelectTrigger id="p-category">
+                      <SelectValue placeholder="Choose a category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {categoryOptions.map((option) => (
+                        <SelectItem key={option} value={option}>
+                          {option}
+                        </SelectItem>
+                      ))}
+                      <SelectItem value={NEW_CATEGORY}>+ Add new category</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  {(newCategory || !form.category) && (
+                    <Input
+                      value={form.category}
+                      onChange={(e) => setField('category', e.target.value)}
+                      placeholder="e.g. Face Creams"
+                    />
+                  )}
+                  <p className="text-xs text-muted-foreground">
+                    Categories power the Categories menu and the /categories pages. Pick an existing
+                    one to keep the list tidy.
+                  </p>
                 </div>
                 <div className="flex flex-col gap-2">
                   <Label htmlFor="p-price">Price (Rs.)</Label>

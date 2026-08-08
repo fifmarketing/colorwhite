@@ -8,8 +8,10 @@ export const dynamic = 'force-dynamic'
 export async function GET() {
   const settings = await getSettings()
   return NextResponse.json({
+    topBar: settings.topBar,
     footer: settings.footer,
     whatsapp: settings.whatsapp,
     checkout: settings.checkout,
+    payment: settings.payment,
   })
 }

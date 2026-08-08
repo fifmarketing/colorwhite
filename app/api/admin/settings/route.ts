@@ -6,6 +6,23 @@ import { defaultSettings } from '@/lib/default-content'
 
 const VALID_SECTIONS = Object.keys(defaultSettings)
 
+/**
+ * Accepts a top-level section ("footer") or one level of nesting
+ * ("policies.shipping") so grouped settings can be saved independently.
+ */
+function isValidSection(section: unknown): section is string {
+  if (typeof section !== 'string' || section.length === 0) return false
+  const [root, child, ...rest] = section.split('.')
+  if (rest.length > 0 || !VALID_SECTIONS.includes(root)) return false
+  if (child === undefined) return true
+  const rootValue = defaultSettings[root as keyof typeof defaultSettings]
+  return (
+    typeof rootValue === 'object' &&
+    rootValue !== null &&
+    Object.prototype.hasOwnProperty.call(rootValue, child)
+  )
+}
+
 export async function GET() {
   if (!(await isAdminAuthenticated())) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -20,7 +37,7 @@ export async function PUT(request: NextRequest) {
   }
   try {
     const { section, data } = await request.json()
-    if (!section || !VALID_SECTIONS.includes(section) || typeof data !== 'object') {
+    if (!isValidSection(section) || typeof data !== 'object' || data === null) {
       return NextResponse.json({ error: 'Invalid section or data' }, { status: 400 })
     }
     const db = await getDb()

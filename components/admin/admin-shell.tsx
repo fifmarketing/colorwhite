@@ -14,6 +14,7 @@ import {
   Star,
   Home,
   FileText,
+  ScrollText,
   Image as ImageIcon,
   Settings,
   LogOut,
@@ -29,6 +30,7 @@ const navItems = [
   { href: '/admin/testimonials', label: 'Testimonials', icon: Star },
   { href: '/admin/content', label: 'Homepage Content', icon: Home },
   { href: '/admin/pages', label: 'Page Content', icon: FileText },
+  { href: '/admin/policies', label: 'Policies & FAQs', icon: ScrollText },
   { href: '/admin/images', label: 'Images', icon: ImageIcon },
   { href: '/admin/settings', label: 'Site Settings', icon: Settings },
 ]

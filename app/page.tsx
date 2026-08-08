@@ -1,5 +1,6 @@
-import Image from 'next/image'
+import Link from 'next/link'
 import { Navbar } from '@/components/navbar'
+import { HeroSlider } from '@/components/hero-slider'
 import { Footer } from '@/components/footer'
 import { ProductCard } from '@/components/product-card'
 import { TestimonialCard } from '@/components/testimonial-card'
@@ -17,63 +18,15 @@ export default async function Home() {
   ])
 
   const featuredProducts = products.filter((p) => p.featured)
-  const { hero, homeSections, promoBanner, footer } = settings
+  const { heroSlides, homeSections, promoBanner, footer } = settings
 
   return (
     <main className="min-h-screen bg-background">
       <PromoBanner {...promoBanner} />
       <Navbar />
 
-      {/* Hero Section */}
-      <section className="relative py-16 md:py-32 overflow-hidden">
-        {/* Subtle background gradient with yellow tones */}
-        <div className="absolute inset-0">
-          <div className="absolute top-0 right-0 w-96 h-96 bg-secondary rounded-full mix-blend-multiply filter blur-3xl opacity-40"></div>
-          <div className="absolute bottom-0 left-0 w-96 h-96 bg-secondary rounded-full mix-blend-multiply filter blur-3xl opacity-30"></div>
-        </div>
-
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            {/* Left: Text Content */}
-            <div className="space-y-8 order-1">
-              <div className="space-y-6">
-                <h1 className="text-5xl md:text-6xl font-bold text-foreground leading-tight text-balance">
-                  {hero.title}
-                </h1>
-                <p className="text-lg font-light text-foreground/80 leading-relaxed max-w-md">
-                  {hero.description}
-                </p>
-              </div>
-
-              <a href={hero.buttonLink} className="inline-block bg-primary text-white px-10 py-4 rounded-full font-semibold hover:bg-opacity-90 transition-all duration-300 ease-out transform hover:scale-105 active:scale-95 shadow-lg hover:shadow-xl cursor-pointer">
-                {hero.buttonText}
-              </a>
-
-              {/* Floating animation effect */}
-              <style>{`
-                @keyframes float {
-                  0%, 100% { transform: translateY(0px); }
-                  50% { transform: translateY(-10px); }
-                }
-              `}</style>
-            </div>
-
-            {/* Right: Product Image */}
-            <div className="order-2 flex justify-center">
-              <div className="relative w-full max-w-md h-96">
-                <Image
-                  src={hero.image || '/hero-img.jpg'}
-                  alt="Color White Beauty Cream - Product and Woman"
-                  fill
-                  className="object-contain"
-                  priority
-                />
-              </div>
-            </div>
-
-          </div>
-        </div>
-      </section>
+      {/* Hero Slider */}
+      <HeroSlider slides={heroSlides.slides} autoplaySeconds={heroSlides.autoplaySeconds} />
 
       {/* Featured Products */}
       <section className="py-20 bg-secondary/30">
@@ -123,6 +76,13 @@ export default async function Home() {
             <p className="text-lg font-light text-foreground/70 max-w-2xl mx-auto text-balance">
               {homeSections.testimonialsSubtitle}
             </p>
+            <Link
+              href="/reviews"
+              className="inline-flex items-center gap-2 mt-6 text-sm font-light tracking-wide text-primary hover:gap-3 transition-all cursor-pointer"
+            >
+              View all reviews
+              <ArrowRight className="w-4 h-4" />
+            </Link>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
@@ -132,6 +92,11 @@ export default async function Home() {
                 name={testimonial.name}
                 text={testimonial.text}
                 rating={testimonial.rating}
+                image={testimonial.image}
+                city={testimonial.city}
+                verified={testimonial.verified}
+                dateLabel={testimonial.dateLabel}
+                source={testimonial.source}
               />
             ))}
           </div>

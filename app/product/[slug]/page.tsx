@@ -13,7 +13,13 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion'
-import { getProductBySlug, getRelatedProducts, getSettings } from '@/lib/data'
+import { TestimonialCard } from '@/components/testimonial-card'
+import {
+  getProductBySlug,
+  getRelatedProducts,
+  getSettings,
+  getTestimonialsForProduct,
+} from '@/lib/data'
 
 export const dynamic = 'force-dynamic'
 
@@ -42,9 +48,10 @@ export default async function ProductDetailPage({ params }: PageProps) {
   const product = await getProductBySlug(slug)
   if (!product) notFound()
 
-  const [settings, related] = await Promise.all([
+  const [settings, related, productReviews] = await Promise.all([
     getSettings(),
     getRelatedProducts(product, 3),
+    getTestimonialsForProduct(product.slug),
   ])
 
   const galleryImages = Array.from(new Set([product.image, ...product.gallery])).filter(Boolean)
@@ -339,6 +346,46 @@ export default async function ProductDetailPage({ params }: PageProps) {
                 </AccordionItem>
               ))}
             </Accordion>
+          </div>
+        </section>
+      )}
+
+      {/* Customer reviews for this product */}
+      {productReviews.length > 0 && (
+        <section className="py-16">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="mb-12 text-center">
+              <p className="mb-3 text-sm font-light uppercase tracking-widest text-primary">
+                Real Feedback
+              </p>
+              <h2 className="text-3xl font-light tracking-tight text-foreground md:text-4xl text-balance">
+                What Customers Say About {product.name}
+              </h2>
+            </div>
+            <div className="grid grid-cols-1 items-start gap-8 md:grid-cols-2 lg:grid-cols-3">
+              {productReviews.map((review) => (
+                <TestimonialCard
+                  key={review._id}
+                  name={review.name}
+                  text={review.text}
+                  rating={review.rating}
+                  image={review.image}
+                  city={review.city}
+                  verified={review.verified}
+                  dateLabel={review.dateLabel}
+                  source={review.source}
+                />
+              ))}
+            </div>
+            <div className="mt-12 text-center">
+              <Link
+                href="/reviews"
+                className="inline-flex items-center gap-2 text-sm font-light tracking-wide text-primary transition-all hover:gap-3 cursor-pointer"
+              >
+                See all customer reviews
+                <ChevronRight className="h-4 w-4" aria-hidden="true" />
+              </Link>
+            </div>
           </div>
         </section>
       )}

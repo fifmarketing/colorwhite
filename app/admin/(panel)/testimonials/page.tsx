@@ -32,7 +32,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
-import { Plus, Pencil, Trash2, Star } from 'lucide-react'
+import { Plus, Pencil, Trash2, Star, ImageIcon } from 'lucide-react'
+import { ImageUploadField } from '@/components/admin/image-upload'
 
 interface Testimonial {
   _id: string
@@ -41,6 +42,20 @@ interface Testimonial {
   rating: number
   active: boolean
   sortOrder: number
+  /** Blurred WhatsApp screenshot URL. */
+  image?: string
+  city?: string
+  dateLabel?: string
+  verified?: boolean
+  source?: 'whatsapp' | 'website'
+  /** Product slugs this review should also appear on. */
+  productSlugs?: string[]
+}
+
+interface ProductOption {
+  _id: string
+  name: string
+  slug: string
 }
 
 interface FormState {
@@ -48,15 +63,36 @@ interface FormState {
   text: string
   rating: string
   active: boolean
+  image: string
+  city: string
+  dateLabel: string
+  verified: boolean
+  source: 'whatsapp' | 'website'
+  productSlugs: string[]
 }
 
-const emptyForm: FormState = { name: '', text: '', rating: '5', active: true }
+const emptyForm: FormState = {
+  name: '',
+  text: '',
+  rating: '5',
+  active: true,
+  image: '',
+  city: '',
+  dateLabel: '',
+  verified: true,
+  source: 'whatsapp',
+  productSlugs: [],
+}
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json())
 
 export default function AdminTestimonialsPage() {
   const { data, isLoading, mutate } = useSWR<{ testimonials: Testimonial[] }>(
     '/api/admin/testimonials',
+    fetcher
+  )
+  const { data: productData } = useSWR<{ products: ProductOption[] }>(
+    '/api/admin/products',
     fetcher
   )
   const [dialogOpen, setDialogOpen] = useState(false)
@@ -67,6 +103,7 @@ export default function AdminTestimonialsPage() {
   const [error, setError] = useState('')
 
   const testimonials = data?.testimonials ?? []
+  const products = productData?.products ?? []
 
   const openCreate = () => {
     setEditing(null)
@@ -77,14 +114,30 @@ export default function AdminTestimonialsPage() {
 
   const openEdit = (t: Testimonial) => {
     setEditing(t)
-    setForm({ name: t.name, text: t.text, rating: String(t.rating), active: t.active })
+    setForm({
+      name: t.name,
+      text: t.text,
+      rating: String(t.rating),
+      active: t.active,
+      image: t.image ?? '',
+      city: t.city ?? '',
+      dateLabel: t.dateLabel ?? '',
+      verified: t.verified ?? true,
+      source: t.source ?? 'whatsapp',
+      productSlugs: t.productSlugs ?? [],
+    })
     setError('')
     setDialogOpen(true)
   }
 
   const handleSave = async () => {
-    if (!form.name.trim() || !form.text.trim()) {
-      setError('Name and testimonial text are required.')
+    if (!form.name.trim()) {
+      setError('Customer name is required.')
+      return
+    }
+    // A screenshot can stand on its own, but a text-only review needs the quote.
+    if (!form.text.trim() && !form.image.trim()) {
+      setError('Add the review text or upload a screenshot.')
       return
     }
     setBusy(true)
@@ -94,6 +147,12 @@ export default function AdminTestimonialsPage() {
       text: form.text.trim(),
       rating: Number(form.rating),
       active: form.active,
+      image: form.image.trim(),
+      city: form.city.trim(),
+      dateLabel: form.dateLabel.trim(),
+      verified: form.verified,
+      source: form.source,
+      productSlugs: form.productSlugs,
     }
     const res = editing
       ? await fetch(`/api/admin/testimonials/${editing._id}`, {
@@ -167,6 +226,14 @@ export default function AdminTestimonialsPage() {
             <Card key={t._id} className={t.active ? '' : 'opacity-60'}>
               <CardContent className="p-4">
                 <div className="flex flex-col sm:flex-row sm:items-start gap-3">
+                  {t.image && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={t.image}
+                      alt={`Screenshot from ${t.name}`}
+                      className="h-20 w-20 shrink-0 rounded-md border border-border object-cover"
+                    />
+                  )}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
                       <p className="font-medium text-foreground text-sm">{t.name}</p>
@@ -183,8 +250,27 @@ export default function AdminTestimonialsPage() {
                         ))}
                       </div>
                       {!t.active && <Badge variant="outline">Hidden</Badge>}
+                      {t.image && (
+                        <Badge variant="secondary" className="gap-1">
+                          <ImageIcon className="h-3 w-3" />
+                          Screenshot
+                        </Badge>
+                      )}
+                      {(t.productSlugs?.length ?? 0) > 0 && (
+                        <Badge variant="outline">
+                          {t.productSlugs!.length} product
+                          {t.productSlugs!.length === 1 ? '' : 's'}
+                        </Badge>
+                      )}
                     </div>
-                    <p className="text-sm text-muted-foreground mt-1 leading-relaxed">{t.text}</p>
+                    {t.text && (
+                      <p className="text-sm text-muted-foreground mt-1 leading-relaxed">{t.text}</p>
+                    )}
+                    {(t.city || t.dateLabel) && (
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {[t.city, t.dateLabel].filter(Boolean).join(' · ')}
+                      </p>
+                    )}
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
                     <Switch
@@ -218,11 +304,19 @@ export default function AdminTestimonialsPage() {
 
       {/* Create / Edit dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>{editing ? 'Edit Testimonial' : 'Add Testimonial'}</DialogTitle>
+            <DialogTitle>{editing ? 'Edit Review' : 'Add Review'}</DialogTitle>
           </DialogHeader>
           <div className="flex flex-col gap-4">
+            <ImageUploadField
+              label="WhatsApp Screenshot (optional)"
+              hint="Blur the customer's phone number and profile photo before uploading. Only upload with their permission."
+              value={form.image}
+              onChange={(url) => setForm({ ...form, image: url })}
+              folder="testimonials"
+              id="t-image"
+            />
             <div className="flex flex-col gap-2">
               <Label htmlFor="t-name">Customer Name</Label>
               <Input
@@ -233,14 +327,34 @@ export default function AdminTestimonialsPage() {
               />
             </div>
             <div className="flex flex-col gap-2">
-              <Label htmlFor="t-text">Testimonial</Label>
+              <Label htmlFor="t-text">Review Text</Label>
               <Textarea
                 id="t-text"
                 value={form.text}
                 onChange={(e) => setForm({ ...form, text: e.target.value })}
-                placeholder="What did the customer say?"
+                placeholder="What did the customer say? Optional if a screenshot is attached."
                 rows={4}
               />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="t-city">City (optional)</Label>
+                <Input
+                  id="t-city"
+                  value={form.city}
+                  onChange={(e) => setForm({ ...form, city: e.target.value })}
+                  placeholder="e.g. Lahore"
+                />
+              </div>
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="t-date">Date Label (optional)</Label>
+                <Input
+                  id="t-date"
+                  value={form.dateLabel}
+                  onChange={(e) => setForm({ ...form, dateLabel: e.target.value })}
+                  placeholder="e.g. March 2026"
+                />
+              </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="flex flex-col gap-2">
@@ -272,6 +386,74 @@ export default function AdminTestimonialsPage() {
                 </div>
               </div>
             </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="flex flex-col gap-2">
+                <Label>Source</Label>
+                <Select
+                  value={form.source}
+                  onValueChange={(value) =>
+                    setForm({ ...form, source: value as FormState['source'] })
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="whatsapp">WhatsApp</SelectItem>
+                    <SelectItem value="website">Website</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="t-verified">Show verified badge</Label>
+                <div className="flex items-center h-9">
+                  <Switch
+                    id="t-verified"
+                    checked={form.verified}
+                    onCheckedChange={(checked) => setForm({ ...form, verified: checked })}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <Label>Show on product pages (optional)</Label>
+              <p className="text-xs text-muted-foreground">
+                Tag the products this review is about so it also appears on their pages.
+              </p>
+              {products.length === 0 ? (
+                <p className="text-xs text-muted-foreground">No products available yet.</p>
+              ) : (
+                <div className="flex flex-wrap gap-2 rounded-md border border-border p-3 max-h-40 overflow-y-auto">
+                  {products.map((p) => {
+                    const selected = form.productSlugs.includes(p.slug)
+                    return (
+                      <button
+                        key={p._id}
+                        type="button"
+                        onClick={() =>
+                          setForm({
+                            ...form,
+                            productSlugs: selected
+                              ? form.productSlugs.filter((s) => s !== p.slug)
+                              : [...form.productSlugs, p.slug],
+                          })
+                        }
+                        aria-pressed={selected}
+                        className={`rounded-full border px-3 py-1 text-xs transition-colors cursor-pointer ${
+                          selected
+                            ? 'border-primary bg-primary text-primary-foreground'
+                            : 'border-border text-muted-foreground hover:border-primary/50'
+                        }`}
+                      >
+                        {p.name}
+                      </button>
+                    )
+                  })}
+                </div>
+              )}
+            </div>
+
             {error && <p className="text-sm text-destructive">{error}</p>}
             <div className="flex justify-end gap-2">
               <Button variant="outline" onClick={() => setDialogOpen(false)} disabled={busy}>

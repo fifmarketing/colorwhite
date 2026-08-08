@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { ObjectId } from 'mongodb'
 import { getDb } from '@/lib/mongodb'
 import { isAdminAuthenticated } from '@/lib/admin-auth'
+import { pickReviewFieldUpdates } from '@/lib/reviews'
 
 export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   if (!(await isAdminAuthenticated())) {
@@ -14,6 +15,9 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     for (const key of ['name', 'text', 'rating', 'active', 'sortOrder']) {
       if (body[key] !== undefined) update[key] = body[key]
     }
+    // Only merge the optional review fields the request actually sent, so the
+    // visibility toggle cannot clear a stored screenshot or product tags.
+    Object.assign(update, pickReviewFieldUpdates(body))
     const db = await getDb()
     await db.collection('testimonials').updateOne({ _id: new ObjectId(id) }, { $set: update })
     return NextResponse.json({ success: true })

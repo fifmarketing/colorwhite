@@ -1,12 +1,18 @@
 'use client'
 
+import { Suspense } from 'react'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import { Navbar } from '@/components/navbar'
 import { Footer } from '@/components/footer'
 import { ArrowRight, CheckCircle, Truck, Gift, Phone } from 'lucide-react'
 
-export default function OrderSuccessPage() {
-  const orderNumber = Math.floor(100000 + Math.random() * 900000)
+function OrderSuccessContent() {
+  const searchParams = useSearchParams()
+  // The real order id comes from the API so it matches the database and emails.
+  const orderNumber = searchParams.get('order')
+  const total = Number(searchParams.get('total'))
+  const isBankTransfer = searchParams.get('method') === 'bank'
   const estimatedDelivery = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', {
     month: 'long',
     day: 'numeric',
@@ -43,12 +49,19 @@ export default function OrderSuccessPage() {
           </div>
 
           {/* Order Number */}
-          <div className="inline-block p-6 rounded-2xl bg-gradient-to-r from-green-100 to-green-50 border border-green-200">
-            <p className="text-sm font-light text-green-700 mb-2">Order Number</p>
-            <p className="text-3xl font-light text-green-600 font-semibold tracking-wider">
-              #{orderNumber}
-            </p>
-          </div>
+          {orderNumber && (
+            <div className="inline-block p-6 rounded-2xl bg-gradient-to-r from-green-100 to-green-50 border border-green-200">
+              <p className="text-sm font-light text-green-700 mb-2">Order Number</p>
+              <p className="text-3xl font-light text-green-600 font-semibold tracking-wider">
+                {orderNumber}
+              </p>
+              {total > 0 && (
+                <p className="text-sm font-light text-green-700 mt-2">
+                  Total: Rs. {total.toLocaleString()}
+                </p>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Order Details Cards */}
@@ -78,10 +91,12 @@ export default function OrderSuccessPage() {
               <h3 className="text-lg font-light text-foreground">Payment Method</h3>
             </div>
             <p className="text-2xl font-light text-primary">
-              Cash on Delivery
+              {isBankTransfer ? 'Bank Transfer' : 'Cash on Delivery'}
             </p>
             <p className="text-sm font-light text-foreground/60 mt-2">
-              Pay when you receive your order
+              {isBankTransfer
+                ? 'We are verifying your transfer'
+                : 'Pay when you receive your order'}
             </p>
           </div>
 
@@ -112,7 +127,12 @@ export default function OrderSuccessPage() {
               </div>
               <div>
                 <p className="font-light text-foreground">
-                  <span className="font-semibold">Confirmation Email</span> - You&apos;ll receive an order confirmation with all details
+                  <span className="font-semibold">
+                    {isBankTransfer ? 'Payment Verification' : 'Order Confirmation'}
+                  </span>
+                  {isBankTransfer
+                    ? " - We'll verify your transfer and confirm on WhatsApp"
+                    : " - We'll confirm your order on WhatsApp, plus email if you shared one"}
                 </p>
               </div>
             </div>
@@ -177,5 +197,14 @@ export default function OrderSuccessPage() {
 
       <Footer />
     </main>
+  )
+}
+
+export default function OrderSuccessPage() {
+  // useSearchParams requires a Suspense boundary during prerendering.
+  return (
+    <Suspense fallback={<main className="min-h-screen bg-background" />}>
+      <OrderSuccessContent />
+    </Suspense>
   )
 }
