@@ -126,6 +126,30 @@
 }
 
 @layer utilities {
+  /* Continuous right-to-left ticker for the top trust bar. The track repeats
+     the content, and shifting it by exactly one copy's width (measured in JS
+     and passed as --marquee-shift) makes the loop seamless. */
+  @keyframes marquee-rtl {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(calc(-1 * var(--marquee-shift, 50%)));
+    }
+  }
+
+  .animate-marquee-rtl {
+    animation: marquee-rtl var(--marquee-duration, 30s) linear infinite;
+  }
+
+  /* Honour users who ask for less motion: hold the strip still instead. */
+  @media (prefers-reduced-motion: reduce) {
+    .animate-marquee-rtl {
+      animation: none;
+      transform: translateX(0);
+    }
+  }
+
   /* Luxury shadow effects */
   .shadow-luxury {
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
