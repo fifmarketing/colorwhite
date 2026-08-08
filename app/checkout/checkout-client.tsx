@@ -177,7 +177,14 @@ export function CheckoutClient({
       }
 
       clearCart()
-      router.push('/order-success')
+      // Carry the real order id and server-verified total to the confirmation
+      // screen so it matches the database and the emails.
+      const params = new URLSearchParams({
+        order: String(data.orderId ?? ''),
+        total: String(data.total ?? ''),
+        method: String(data.paymentMethod ?? paymentMethod),
+      })
+      router.push(`/order-success?${params.toString()}`)
     } catch (error) {
       console.error('Order submission error:', error)
       setErrors({ submit: error instanceof Error ? error.message : 'Something went wrong. Please try again.' })
@@ -334,17 +341,27 @@ export function CheckoutClient({
                       placeholder="+92 XXX XXXXXXX"
                     />
                     {errors.phone && (
-                      <p className="text-sm text-destructive mt-2 font-light">{errors.phone}</p>
+                      <p id="phone-error" className="text-sm text-destructive mt-2 font-light">
+                        {errors.phone}
+                      </p>
                     )}
                   </div>
 
                   {/* Address */}
                   <div>
-                    <label className="block text-sm font-light text-foreground mb-2 tracking-wide">
+                    <label
+                      htmlFor="address"
+                      className="block text-sm font-light text-foreground mb-2 tracking-wide"
+                    >
                       Shipping Address <span className="text-primary">*</span>
                     </label>
                     <textarea
+                      id="address"
                       name="address"
+                      required
+                      autoComplete="street-address"
+                      aria-invalid={!!errors.address}
+                      aria-describedby={errors.address ? 'address-error' : undefined}
                       value={formData.address}
                       onChange={handleChange}
                       className={`w-full px-5 py-3 rounded-xl bg-gradient-to-r from-primary/5 to-transparent border-2 transition-all duration-300 ${
@@ -356,7 +373,9 @@ export function CheckoutClient({
                       rows={3}
                     />
                     {errors.address && (
-                      <p className="text-sm text-destructive mt-2 font-light">{errors.address}</p>
+                      <p id="address-error" className="text-sm text-destructive mt-2 font-light">
+                        {errors.address}
+                      </p>
                     )}
                     
                     {/* Save Information Checkbox */}
@@ -381,12 +400,20 @@ export function CheckoutClient({
                   {/* City, Postal Code */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-light text-foreground mb-2 tracking-wide">
+                      <label
+                        htmlFor="city"
+                        className="block text-sm font-light text-foreground mb-2 tracking-wide"
+                      >
                         City <span className="text-primary">*</span>
                       </label>
                       <input
+                        id="city"
                         type="text"
                         name="city"
+                        required
+                        autoComplete="address-level2"
+                        aria-invalid={!!errors.city}
+                        aria-describedby={errors.city ? 'city-error' : undefined}
                         value={formData.city}
                         onChange={handleChange}
                         className={`w-full px-5 py-3 rounded-xl bg-gradient-to-r from-primary/5 to-transparent border-2 transition-all duration-300 ${
@@ -397,17 +424,24 @@ export function CheckoutClient({
                         placeholder="City"
                       />
                       {errors.city && (
-                        <p className="text-sm text-destructive mt-2 font-light">{errors.city}</p>
+                        <p id="city-error" className="text-sm text-destructive mt-2 font-light">
+                          {errors.city}
+                        </p>
                       )}
                     </div>
 
                     <div>
-                      <label className="block text-sm font-light text-foreground mb-2 tracking-wide">
-                        Postal Code
+                      <label
+                        htmlFor="postalCode"
+                        className="block text-sm font-light text-foreground mb-2 tracking-wide"
+                      >
+                        Postal Code <span className="text-foreground/50">(optional)</span>
                       </label>
                       <input
+                        id="postalCode"
                         type="text"
                         name="postalCode"
+                        autoComplete="postal-code"
                         value={formData.postalCode}
                         onChange={handleChange}
                         className="w-full px-5 py-3 rounded-xl bg-gradient-to-r from-primary/5 to-transparent border-2 transition-all duration-300 border-primary/20 focus:border-primary/60 text-foreground font-light focus:outline-none focus:ring-2 focus:ring-primary/20"
