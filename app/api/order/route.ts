@@ -18,9 +18,10 @@ interface OrderFormData {
   city: string
   postalCode: string
   items: OrderItem[]
-  subtotal: number
-  shipping: number
-  total: number
+  paymentMethod?: 'cod' | 'bank'
+  /** Cloudinary URL of the customer's bank transfer screenshot. */
+  paymentProof?: string
+  paymentReference?: string
 }
 
 const resend = new Resend(process.env.RESEND_API_KEY)
@@ -29,30 +30,71 @@ export async function POST(request: NextRequest) {
   try {
     const body: OrderFormData = await request.json()
 
-    // Validate required fields
+    // Email and postal code are optional: most COD customers in Pakistan
+    // order with just a phone number and address.
     if (
-      !body.fullName ||
-      !body.email ||
-      !body.phone ||
-      !body.address ||
-      !body.city ||
-      !body.postalCode ||
-      !body.items ||
-      body.items.length === 0
+      !body.fullName?.trim() ||
+      !body.phone?.trim() ||
+      !body.address?.trim() ||
+      !body.city?.trim()
     ) {
       return NextResponse.json(
-        { error: 'Missing required order fields' },
+        { error: 'Name, phone number, address and city are required' },
         { status: 400 }
       )
     }
 
+    const email = body.email?.trim() ?? ''
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    if (!emailRegex.test(body.email)) {
+    if (email && !emailRegex.test(email)) {
+      return NextResponse.json({ error: 'Invalid email format' }, { status: 400 })
+    }
+
+    const settings = await getSettings()
+    const paymentMethod = body.paymentMethod === 'bank' ? 'bank' : 'cod'
+
+    // Never let the browser pick a method the store has switched off.
+    if (paymentMethod === 'bank' && !settings.payment.bankEnabled) {
       return NextResponse.json(
-        { error: 'Invalid email format' },
+        { error: 'Bank transfer is not available right now. Please choose Cash on Delivery.' },
         { status: 400 }
       )
     }
+    if (paymentMethod === 'cod' && !settings.payment.codEnabled) {
+      return NextResponse.json(
+        { error: 'Cash on Delivery is not available right now. Please choose Bank Transfer.' },
+        { status: 400 }
+      )
+    }
+
+    const paymentProof = typeof body.paymentProof === 'string' ? body.paymentProof.trim() : ''
+    const paymentReference =
+      typeof body.paymentReference === 'string' ? body.paymentReference.trim() : ''
+
+    if (paymentMethod === 'bank' && settings.payment.requireProof && !paymentProof) {
+      return NextResponse.json(
+        { error: 'Please upload your payment screenshot to confirm the bank transfer.' },
+        { status: 400 }
+      )
+    }
+
+    // Prices, shipping and the total are recomputed from the database so a
+    // tampered request cannot change what the customer is charged.
+    let priced
+    try {
+      priced = await priceOrder(body.items)
+    } catch (pricingError) {
+      if (pricingError instanceof PricingError) {
+        return NextResponse.json({ error: pricingError.message }, { status: 400 })
+      }
+      throw pricingError
+    }
+
+    const { items, subtotal, shipping, total } = priced
+    const paymentLabel =
+      paymentMethod === 'bank'
+        ? settings.payment.bankLabel || 'Bank Transfer'
+        : settings.payment.codLabel || 'Cash on Delivery (COD)'
 
     const fromEmail = process.env.FROM_EMAIL
     const fromName = process.env.FROM_NAME
@@ -73,16 +115,21 @@ export async function POST(request: NextRequest) {
       const db = await getDb()
       await db.collection('orders').insertOne({
         orderId,
-        fullName: body.fullName,
-        email: body.email,
-        phone: body.phone,
-        address: body.address,
-        city: body.city,
-        postalCode: body.postalCode,
-        items: body.items,
-        subtotal: body.subtotal,
-        shipping: body.shipping,
-        total: body.total,
+        fullName: body.fullName.trim(),
+        email,
+        phone: body.phone.trim(),
+        address: body.address.trim(),
+        city: body.city.trim(),
+        postalCode: body.postalCode?.trim() ?? '',
+        items,
+        subtotal,
+        shipping,
+        total,
+        paymentMethod,
+        paymentProof,
+        paymentReference,
+        // Bank transfers wait on manual verification before fulfilment.
+        paymentStatus: paymentMethod === 'bank' ? 'awaiting_verification' : 'cod_pending',
         status: 'pending',
         createdAt: new Date(),
       })
