@@ -14,8 +14,19 @@ export interface Product extends ProductDoc {
   _id: string
 }
 
+/**
+ * A testimonial after normalization: the optional document fields are always
+ * filled in so components never have to branch on `undefined`.
+ */
 export interface Testimonial extends TestimonialDoc {
   _id: string
+  image: string
+  productSlug: string
+  productSlugs: string[]
+  city: string
+  source: 'whatsapp' | 'website'
+  verified: boolean
+  dateLabel: string
 }
 
 // Deep-merge stored settings over the defaults so newly added
@@ -255,9 +266,15 @@ export function normalizeTestimonial(raw: Record<string, unknown>, id: string): 
     sortOrder: Number(doc.sortOrder ?? 0),
     image: typeof doc.image === 'string' ? doc.image : '',
     productSlug: typeof doc.productSlug === 'string' ? doc.productSlug : '',
+    // Newer documents tag several products; fall back to the legacy single slug.
+    productSlugs: Array.isArray(doc.productSlugs)
+      ? doc.productSlugs.filter((slug): slug is string => typeof slug === 'string' && slug !== '')
+      : typeof doc.productSlug === 'string' && doc.productSlug
+        ? [doc.productSlug]
+        : [],
     city: typeof doc.city === 'string' ? doc.city : '',
     source: doc.source === 'whatsapp' ? 'whatsapp' : 'website',
-    verified: doc.verified === true,
+    verified: doc.verified !== false,
     dateLabel: typeof doc.dateLabel === 'string' ? doc.dateLabel : '',
   }
 }
@@ -288,7 +305,7 @@ export async function getTestimonials(options?: {
 export async function getTestimonialsForProduct(slug: string): Promise<Testimonial[]> {
   if (!slug) return []
   const all = await getTestimonials()
-  return all.filter((t) => t.productSlug === slug)
+  return all.filter((t) => t.productSlugs.includes(slug))
 }
 
 async function ensureTestimonialsSeeded() {

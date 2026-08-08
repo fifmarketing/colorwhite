@@ -858,8 +858,10 @@ export interface TestimonialDoc {
   sortOrder: number
   /** Optional WhatsApp screenshot. Client blurs sender details before uploading. */
   image?: string
-  /** Links the review to a product detail page when set. */
+  /** Legacy single-product link, still read for older documents. */
   productSlug?: string
+  /** Product slugs whose detail pages should also show this review. */
+  productSlugs?: string[]
   city?: string
   source?: 'whatsapp' | 'website'
   verified?: boolean

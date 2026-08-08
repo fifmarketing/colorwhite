@@ -92,6 +92,11 @@ export default async function Home() {
                 name={testimonial.name}
                 text={testimonial.text}
                 rating={testimonial.rating}
+                image={testimonial.image}
+                city={testimonial.city}
+                verified={testimonial.verified}
+                dateLabel={testimonial.dateLabel}
+                source={testimonial.source}
               />
             ))}
           </div>
