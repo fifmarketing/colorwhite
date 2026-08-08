@@ -74,9 +74,10 @@ export async function priceOrder(rawItems: unknown): Promise<PricedOrder> {
 
   const items: PricedLine[] = []
   for (const [id, mergedQuantity] of quantityById) {
-    // The cart stores productId, but fall back to the Mongo _id and slug.
+    // The cart stores the numeric productId, but fall back to the Mongo _id
+    // and slug so older carts still resolve.
     const product = products.find(
-      (p) => p.productId === id || p._id === id || p.slug === id
+      (p) => String(p.productId) === id || p._id === id || p.slug === id
     )
     if (!product) {
       throw new PricingError('One of the products in your cart is no longer available.')
@@ -87,7 +88,7 @@ export async function priceOrder(rawItems: unknown): Promise<PricedOrder> {
       throw new PricingError(`${product.name} is not available for purchase right now.`)
     }
     items.push({
-      id: product.productId,
+      id: String(product.productId),
       name: product.name,
       price,
       quantity,

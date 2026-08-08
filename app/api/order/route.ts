@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { Resend } from 'resend'
-import { getDb } from '@/lib/mongodb'
+import { getDb, isDbConfigured } from '@/lib/mongodb'
+import { getSettings } from '@/lib/data'
+import { priceOrder, PricingError } from '@/lib/pricing'
 
 interface OrderItem {
   id: string | number
@@ -24,7 +26,12 @@ interface OrderFormData {
   paymentReference?: string
 }
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+/** Signals that persistence was intentionally skipped, not that it failed. */
+class SkipPersistence extends Error {}
+
+// Constructed lazily: the Resend client throws when the key is absent, and a
+// missing key must not take down order taking.
+const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null
 
 export async function POST(request: NextRequest) {
   try {
@@ -110,8 +117,13 @@ export async function POST(request: NextRequest) {
       minute: '2-digit',
     })
 
-    // Save order to MongoDB
+    // Save order to MongoDB. When no database is configured the email
+    // notification is the only record, so the order is still allowed through.
     try {
+      if (!isDbConfigured) {
+        console.error('[v0] MONGODB_URI not set; order', orderId, 'was not persisted')
+        throw new SkipPersistence()
+      }
       const db = await getDb()
       await db.collection('orders').insertOne({
         orderId,
@@ -134,11 +146,19 @@ export async function POST(request: NextRequest) {
         createdAt: new Date(),
       })
     } catch (dbError) {
-      console.error('[v0] Failed to save order to database:', dbError)
+      // A configured database that rejects the write is the source of truth for
+      // fulfilment, so it must surface rather than silently lose the order.
+      if (!(dbError instanceof SkipPersistence)) {
+        console.error('[v0] Failed to save order to database:', dbError)
+        return NextResponse.json(
+          { error: 'We could not record your order. Please try again or contact us on WhatsApp.' },
+          { status: 500 }
+        )
+      }
     }
 
     // Build items HTML rows
-    const itemsHtml = body.items
+    const itemsHtml = items
       .map(
         (item) => `
         <tr>
@@ -153,11 +173,31 @@ export async function POST(request: NextRequest) {
       )
       .join('')
 
+    // ---- NOTIFICATIONS ----
+    // The order is already persisted, so email problems are logged and never
+    // reported to the customer as a failed order.
+    if (!resend) {
+      console.error('[v0] RESEND_API_KEY is not set; order emails were skipped for', orderId)
+      return NextResponse.json(
+        {
+          success: true,
+          orderId,
+          subtotal,
+          shipping,
+          total,
+          paymentMethod,
+          message: 'Order placed successfully!',
+        },
+        { status: 200 }
+      )
+    }
+
+    try {
     // ---- ADMIN EMAIL ----
     const adminEmailResult = await resend.emails.send({
       from: `${fromName} <${fromEmail}>`,
       to: adminEmail,
-      replyTo: body.email,
+      ...(email ? { replyTo: email } : {}),
       subject: `New Order Received - ${orderId}`,
       html: `
         <!DOCTYPE html>
@@ -200,7 +240,11 @@ export async function POST(request: NextRequest) {
                 <tr>
                   <td style="padding: 8px 0; color: #666;">Email</td>
                   <td style="padding: 8px 0; color: #111; font-weight: 600;">
-                    <a href="mailto:${body.email}" style="color: #8b6f47; text-decoration: none;">${body.email}</a>
+                    ${
+                      email
+                        ? `<a href="mailto:${email}" style="color: #8b6f47; text-decoration: none;">${email}</a>`
+                        : '<span style="color: #999;">Not provided</span>'
+                    }
                   </td>
                 </tr>
                 <tr>
@@ -219,14 +263,39 @@ export async function POST(request: NextRequest) {
                 </tr>
                 <tr>
                   <td style="padding: 8px 0; color: #666;">Postal Code</td>
-                  <td style="padding: 8px 0; color: #111; font-weight: 600;">${body.postalCode}</td>
+                  <td style="padding: 8px 0; color: #111; font-weight: 600;">${body.postalCode?.trim() || '—'}</td>
                 </tr>
                 <tr>
                   <td style="padding: 8px 0; color: #666;">Payment</td>
-                  <td style="padding: 8px 0; color: #111; font-weight: 600;">Cash on Delivery (COD)</td>
+                  <td style="padding: 8px 0; color: #111; font-weight: 600;">${paymentLabel}</td>
                 </tr>
+                ${
+                  paymentReference
+                    ? `<tr>
+                  <td style="padding: 8px 0; color: #666;">Reference</td>
+                  <td style="padding: 8px 0; color: #111; font-weight: 600;">${paymentReference}</td>
+                </tr>`
+                    : ''
+                }
               </table>
             </div>
+
+            ${
+              paymentMethod === 'bank'
+                ? `<div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px; margin-bottom: 24px;">
+              <h2 style="color: #111; font-size: 18px; font-weight: 700; margin: 0 0 8px;">Payment Verification Needed</h2>
+              <p style="color: #555; font-size: 14px; line-height: 1.7; margin: 0 0 16px;">
+                This customer paid by bank transfer. Confirm the amount landed in your account before dispatching.
+              </p>
+              ${
+                paymentProof
+                  ? `<a href="${paymentProof}" style="display: inline-block; background: #8b6f47; color: white; text-decoration: none; padding: 12px 20px; border-radius: 8px; font-size: 14px; font-weight: 600;">View Payment Screenshot</a>
+              <p style="margin: 16px 0 0;"><img src="${paymentProof}" alt="Payment screenshot" style="max-width: 100%; border: 1px solid #e5e7eb; border-radius: 8px;"></p>`
+                  : '<p style="margin: 0; color: #b45309; font-size: 14px; font-weight: 600;">No screenshot was attached.</p>'
+              }
+            </div>`
+                : ''
+            }
 
             <!-- Order Items -->
             <div style="background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px; margin-bottom: 24px;">
@@ -248,15 +317,15 @@ export async function POST(request: NextRequest) {
               <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
                 <tr>
                   <td style="padding: 6px 0; color: #666;">Subtotal</td>
-                  <td style="padding: 6px 0; text-align: right; color: #111; font-weight: 600;">Rs. ${body.subtotal.toLocaleString()}</td>
+                  <td style="padding: 6px 0; text-align: right; color: #111; font-weight: 600;">Rs. ${subtotal.toLocaleString()}</td>
                 </tr>
                 <tr>
                   <td style="padding: 6px 0; color: #666;">Shipping</td>
-                  <td style="padding: 6px 0; text-align: right; color: #111; font-weight: 600;">Rs. ${body.shipping.toLocaleString()}</td>
+                  <td style="padding: 6px 0; text-align: right; color: #111; font-weight: 600;">${shipping === 0 ? 'Free' : `Rs. ${shipping.toLocaleString()}`}</td>
                 </tr>
                 <tr>
                   <td style="padding: 14px 0 0; border-top: 2px solid #e5e7eb; color: #111; font-size: 16px; font-weight: 700;">Total Amount</td>
-                  <td style="padding: 14px 0 0; border-top: 2px solid #e5e7eb; text-align: right; color: #8b6f47; font-size: 20px; font-weight: 700;">Rs. ${body.total.toLocaleString()}</td>
+                  <td style="padding: 14px 0 0; border-top: 2px solid #e5e7eb; text-align: right; color: #8b6f47; font-size: 20px; font-weight: 700;">Rs. ${total.toLocaleString()}</td>
                 </tr>
               </table>
             </div>
@@ -272,9 +341,11 @@ export async function POST(request: NextRequest) {
     })
 
     // ---- CUSTOMER CONFIRMATION ----
+    // Only possible when the customer chose to share an email address.
+    if (email) {
     await resend.emails.send({
       from: `${fromName} <${fromEmail}>`,
-      to: body.email,
+      to: email,
       subject: `Order Confirmation - ${orderId}`,
       html: `
         <!DOCTYPE html>
@@ -317,7 +388,7 @@ export async function POST(request: NextRequest) {
               <p style="margin: 0; color: #333; font-size: 14px; line-height: 1.7;">
                 <strong>${body.fullName}</strong><br>
                 ${body.address}<br>
-                ${body.city}, ${body.postalCode}<br>
+                ${[body.city, body.postalCode?.trim()].filter(Boolean).join(', ')}<br>
                 ${body.phone}
               </p>
             </div>
@@ -340,19 +411,19 @@ export async function POST(request: NextRequest) {
               <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
                 <tr>
                   <td style="padding: 6px 0; color: #666;">Subtotal</td>
-                  <td style="padding: 6px 0; text-align: right; color: #111; font-weight: 600;">Rs. ${body.subtotal.toLocaleString()}</td>
+                  <td style="padding: 6px 0; text-align: right; color: #111; font-weight: 600;">Rs. ${subtotal.toLocaleString()}</td>
                 </tr>
                 <tr>
                   <td style="padding: 6px 0; color: #666;">Shipping</td>
-                  <td style="padding: 6px 0; text-align: right; color: #111; font-weight: 600;">Rs. ${body.shipping.toLocaleString()}</td>
+                  <td style="padding: 6px 0; text-align: right; color: #111; font-weight: 600;">${shipping === 0 ? 'Free' : `Rs. ${shipping.toLocaleString()}`}</td>
                 </tr>
                 <tr>
                   <td style="padding: 6px 0; color: #666;">Payment</td>
-                  <td style="padding: 6px 0; text-align: right; color: #111; font-weight: 600;">Cash on Delivery</td>
+                  <td style="padding: 6px 0; text-align: right; color: #111; font-weight: 600;">${paymentLabel}</td>
                 </tr>
                 <tr>
                   <td style="padding: 14px 0 0; border-top: 2px solid #e5e7eb; color: #111; font-size: 16px; font-weight: 700;">Total Amount</td>
-                  <td style="padding: 14px 0 0; border-top: 2px solid #e5e7eb; text-align: right; color: #8b6f47; font-size: 20px; font-weight: 700;">Rs. ${body.total.toLocaleString()}</td>
+                  <td style="padding: 14px 0 0; border-top: 2px solid #e5e7eb; text-align: right; color: #8b6f47; font-size: 20px; font-weight: 700;">Rs. ${total.toLocaleString()}</td>
                 </tr>
               </table>
             </div>
@@ -372,19 +443,24 @@ export async function POST(request: NextRequest) {
         </html>
       `,
     })
+    }
 
     if (adminEmailResult.error) {
       console.error('[v0] Failed to send order admin email:', adminEmailResult.error)
-      return NextResponse.json(
-        { error: 'Failed to place order' },
-        { status: 500 }
-      )
+    }
+    } catch (emailError) {
+      console.error('[v0] Order emails failed for', orderId, emailError)
     }
 
     return NextResponse.json(
       {
         success: true,
         orderId,
+        // Server-verified figures so the confirmation screen cannot disagree.
+        subtotal,
+        shipping,
+        total,
+        paymentMethod,
         message: 'Order placed successfully!',
       },
       { status: 200 }

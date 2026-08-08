@@ -27,17 +27,48 @@ const initialFormData: FormData = {
   postalCode: '',
 }
 
-export function CheckoutClient({ shippingCost = 200 }: { shippingCost?: number }) {
+export interface PaymentSettings {
+  codEnabled: boolean
+  codLabel: string
+  codDescription: string
+  bankEnabled: boolean
+  bankLabel: string
+  bankName: string
+  accountTitle: string
+  accountNumber: string
+  iban: string
+  bankInstructions: string
+  requireProof: boolean
+}
+
+export function CheckoutClient({
+  shippingCost = 200,
+  freeShippingThreshold = 0,
+  payment,
+}: {
+  shippingCost?: number
+  freeShippingThreshold?: number
+  payment: PaymentSettings
+}) {
   const { items, getCartTotal, clearCart } = useCart()
   const router = useRouter()
   const [formData, setFormData] = useState<FormData>(initialFormData)
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [saveInfo, setSaveInfo] = useState(false)
+  const [paymentMethod, setPaymentMethod] = useState<'cod' | 'bank'>(
+    payment.codEnabled ? 'cod' : 'bank'
+  )
+  const [paymentReference, setPaymentReference] = useState('')
+  const [paymentProof, setPaymentProof] = useState('')
+  const [uploadingProof, setUploadingProof] = useState(false)
 
   const subtotal = getCartTotal()
-  const shipping = items.length > 0 ? shippingCost : 0
+  // Mirrors lib/pricing.ts; the server recomputes these before charging.
+  const qualifiesFreeShipping = freeShippingThreshold > 0 && subtotal >= freeShippingThreshold
+  const shipping = items.length === 0 || qualifiesFreeShipping ? 0 : shippingCost
   const total = subtotal + shipping
+  const bankOnly = payment.bankEnabled && !payment.codEnabled
 
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {}
@@ -49,6 +80,9 @@ export function CheckoutClient({ shippingCost = 200 }: { shippingCost?: number }
     if (!formData.phone.trim()) newErrors.phone = 'Phone number is required'
     if (!formData.address.trim()) newErrors.address = 'Shipping address is required'
     if (!formData.city.trim()) newErrors.city = 'City is required'
+    if (paymentMethod === 'bank' && payment.requireProof && !paymentProof) {
+      newErrors.paymentProof = 'Please upload your payment screenshot'
+    }
 
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
@@ -70,6 +104,48 @@ export function CheckoutClient({ shippingCost = 200 }: { shippingCost?: number }
     }
   }
 
+  /** Uploads the customer's bank transfer screenshot straight to Cloudinary. */
+  const handleProofFile = async (file: File | undefined) => {
+    if (!file) return
+    if (!file.type.startsWith('image/')) {
+      setErrors((prev) => ({ ...prev, paymentProof: 'Please choose an image file' }))
+      return
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      setErrors((prev) => ({ ...prev, paymentProof: 'Screenshot must be under 10MB' }))
+      return
+    }
+
+    setUploadingProof(true)
+    setErrors((prev) => ({ ...prev, paymentProof: '' }))
+    try {
+      const signRes = await fetch('/api/checkout/payment-proof/sign', { method: 'POST' })
+      const signed = await signRes.json()
+      if (!signRes.ok) throw new Error(signed.error || 'Could not start the upload')
+
+      const form = new FormData()
+      form.append('file', file)
+      form.append('api_key', signed.apiKey)
+      form.append('timestamp', String(signed.timestamp))
+      form.append('folder', signed.folder)
+      form.append('signature', signed.signature)
+
+      const uploadRes = await fetch(signed.uploadUrl, { method: 'POST', body: form })
+      const uploaded = await uploadRes.json()
+      if (!uploadRes.ok || !uploaded.secure_url) {
+        throw new Error(uploaded?.error?.message || 'Upload failed')
+      }
+      setPaymentProof(String(uploaded.secure_url))
+    } catch (error) {
+      setErrors((prev) => ({
+        ...prev,
+        paymentProof: error instanceof Error ? error.message : 'Upload failed',
+      }))
+    } finally {
+      setUploadingProof(false)
+    }
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
@@ -80,17 +156,17 @@ export function CheckoutClient({ shippingCost = 200 }: { shippingCost?: number }
       const response = await fetch('/api/order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        // Only ids and quantities are sent: the server looks up every price
+        // and recomputes the total so it cannot be tampered with.
         body: JSON.stringify({
           ...formData,
           items: items.map((item) => ({
             id: item.id,
-            name: item.name,
-            price: item.price,
             quantity: item.quantity,
           })),
-          subtotal,
-          shipping,
-          total,
+          paymentMethod,
+          paymentProof,
+          paymentReference,
         }),
       })
 
@@ -170,12 +246,20 @@ export function CheckoutClient({ shippingCost = 200 }: { shippingCost?: number }
                 <div className="space-y-6">
                   {/* Full Name */}
                   <div>
-                    <label className="block text-sm font-light text-foreground mb-2 tracking-wide">
+                    <label
+                      htmlFor="fullName"
+                      className="block text-sm font-light text-foreground mb-2 tracking-wide"
+                    >
                       Full Name <span className="text-primary">*</span>
                     </label>
                     <input
+                      id="fullName"
                       type="text"
                       name="fullName"
+                      required
+                      autoComplete="name"
+                      aria-invalid={!!errors.fullName}
+                      aria-describedby={errors.fullName ? 'fullName-error' : undefined}
                       value={formData.fullName}
                       onChange={handleChange}
                       className={`w-full px-5 py-3 rounded-xl bg-gradient-to-r from-primary/5 to-transparent border-2 transition-all duration-300 ${
@@ -186,18 +270,28 @@ export function CheckoutClient({ shippingCost = 200 }: { shippingCost?: number }
                       placeholder="Enter your full name"
                     />
                     {errors.fullName && (
-                      <p className="text-sm text-destructive mt-2 font-light">{errors.fullName}</p>
+                      <p id="fullName-error" className="text-sm text-destructive mt-2 font-light">
+                        {errors.fullName}
+                      </p>
                     )}
                   </div>
 
                   {/* Email */}
                   <div>
-                    <label className="block text-sm font-light text-foreground mb-2 tracking-wide">
-                      Email Address
+                    <label
+                      htmlFor="email"
+                      className="block text-sm font-light text-foreground mb-2 tracking-wide"
+                    >
+                      Email Address{' '}
+                      <span className="text-foreground/50">(optional)</span>
                     </label>
                     <input
+                      id="email"
                       type="email"
                       name="email"
+                      autoComplete="email"
+                      aria-invalid={!!errors.email}
+                      aria-describedby={errors.email ? 'email-error' : undefined}
                       value={formData.email}
                       onChange={handleChange}
                       className={`w-full px-5 py-3 rounded-xl bg-gradient-to-r from-primary/5 to-transparent border-2 transition-all duration-300 ${
@@ -208,18 +302,28 @@ export function CheckoutClient({ shippingCost = 200 }: { shippingCost?: number }
                       placeholder="your@email.com"
                     />
                     {errors.email && (
-                      <p className="text-sm text-destructive mt-2 font-light">{errors.email}</p>
+                      <p id="email-error" className="text-sm text-destructive mt-2 font-light">
+                        {errors.email}
+                      </p>
                     )}
                   </div>
 
                   {/* Phone */}
                   <div>
-                    <label className="block text-sm font-light text-foreground mb-2 tracking-wide">
+                    <label
+                      htmlFor="phone"
+                      className="block text-sm font-light text-foreground mb-2 tracking-wide"
+                    >
                       Phone Number <span className="text-primary">*</span>
                     </label>
                     <input
+                      id="phone"
                       type="tel"
                       name="phone"
+                      required
+                      autoComplete="tel"
+                      aria-invalid={!!errors.phone}
+                      aria-describedby={errors.phone ? 'phone-error' : undefined}
                       value={formData.phone}
                       onChange={handleChange}
                       className={`w-full px-5 py-3 rounded-xl bg-gradient-to-r from-primary/5 to-transparent border-2 transition-all duration-300 ${
@@ -326,35 +430,182 @@ export function CheckoutClient({ shippingCost = 200 }: { shippingCost?: number }
                 </div>
 
                 <div className="space-y-4">
-                  {/* Cash on Delivery - Only Option */}
-                  <label className={`flex items-start p-6 rounded-2xl border-2 cursor-pointer transition-all duration-300 transform hover:scale-102 ${
-                    formData === initialFormData 
-                      ? 'border-primary/40 bg-gradient-to-r from-primary/10 to-transparent shadow-lg shadow-primary/20' 
-                      : 'border-primary/30 bg-white/30'
-                  }`}>
-                    <div className="relative w-6 h-6 mt-1 flex-shrink-0">
-                      <input
-                        type="radio"
-                        name="paymentMethod"
-                        value="cod"
-                        checked={true}
-                        readOnly
-                        className="w-6 h-6 appearance-none border-2 border-primary rounded-full checked:bg-primary cursor-pointer"
-                      />
-                      <Check className="absolute w-4 h-4 text-white top-1 left-1" />
-                    </div>
-                    <div className="ml-5">
-                      <p className="font-light text-foreground text-lg">Cash on Delivery (COD)</p>
-                      <p className="text-sm font-light text-foreground/70 mt-2">
-                        Pay securely when you receive your order at your doorstep. No hidden charges, full transparency.
-                      </p>
-                      <div className="flex gap-4 mt-4 text-xs font-light text-primary">
-                        <span className="flex items-center gap-1">✓ Safe & Secure</span>
-                        <span className="flex items-center gap-1">✓ Easy Returns</span>
+                  {payment.codEnabled && (
+                    <label
+                      className={`flex items-start p-6 rounded-2xl border-2 transition-all duration-300 ${
+                        paymentMethod === 'cod'
+                          ? 'border-primary/40 bg-gradient-to-r from-primary/10 to-transparent shadow-lg shadow-primary/20'
+                          : 'border-primary/20 bg-white/30'
+                      } ${bankOnly ? '' : 'cursor-pointer'}`}
+                    >
+                      <div className="relative w-6 h-6 mt-1 flex-shrink-0">
+                        <input
+                          type="radio"
+                          name="paymentMethod"
+                          value="cod"
+                          checked={paymentMethod === 'cod'}
+                          onChange={() => setPaymentMethod('cod')}
+                          className="w-6 h-6 appearance-none border-2 border-primary rounded-full checked:bg-primary cursor-pointer"
+                        />
+                        {paymentMethod === 'cod' && (
+                          <Check className="absolute w-4 h-4 text-white top-1 left-1 pointer-events-none" />
+                        )}
                       </div>
-                    </div>
-                  </label>
+                      <div className="ml-5">
+                        <p className="font-light text-foreground text-lg">{payment.codLabel}</p>
+                        <p className="text-sm font-light text-foreground/70 mt-2">
+                          {payment.codDescription}
+                        </p>
+                      </div>
+                    </label>
+                  )}
+
+                  {payment.bankEnabled && (
+                    <label
+                      className={`flex items-start p-6 rounded-2xl border-2 cursor-pointer transition-all duration-300 ${
+                        paymentMethod === 'bank'
+                          ? 'border-primary/40 bg-gradient-to-r from-primary/10 to-transparent shadow-lg shadow-primary/20'
+                          : 'border-primary/20 bg-white/30'
+                      }`}
+                    >
+                      <div className="relative w-6 h-6 mt-1 flex-shrink-0">
+                        <input
+                          type="radio"
+                          name="paymentMethod"
+                          value="bank"
+                          checked={paymentMethod === 'bank'}
+                          onChange={() => setPaymentMethod('bank')}
+                          className="w-6 h-6 appearance-none border-2 border-primary rounded-full checked:bg-primary cursor-pointer"
+                        />
+                        {paymentMethod === 'bank' && (
+                          <Check className="absolute w-4 h-4 text-white top-1 left-1 pointer-events-none" />
+                        )}
+                      </div>
+                      <div className="ml-5">
+                        <p className="font-light text-foreground text-lg">{payment.bankLabel}</p>
+                        <p className="text-sm font-light text-foreground/70 mt-2">
+                          Transfer the total to our account, then upload the screenshot below.
+                        </p>
+                      </div>
+                    </label>
+                  )}
                 </div>
+
+                {/* Bank details and proof upload */}
+                {paymentMethod === 'bank' && payment.bankEnabled && (
+                  <div className="mt-6 space-y-6">
+                    <div className="p-6 rounded-2xl bg-primary/5 border border-primary/20">
+                      <p className="text-sm font-light text-foreground mb-4 tracking-wide">
+                        Transfer{' '}
+                        <span className="text-primary font-semibold">
+                          Rs. {total.toLocaleString()}
+                        </span>{' '}
+                        to:
+                      </p>
+                      <dl className="space-y-2 text-sm font-light">
+                        {[
+                          ['Bank', payment.bankName],
+                          ['Account Title', payment.accountTitle],
+                          ['Account Number', payment.accountNumber],
+                          ['IBAN', payment.iban],
+                        ]
+                          .filter(([, value]) => value)
+                          .map(([label, value]) => (
+                            <div key={label} className="flex justify-between gap-4">
+                              <dt className="text-foreground/60">{label}</dt>
+                              <dd className="text-foreground font-medium text-right break-all">
+                                {value}
+                              </dd>
+                            </div>
+                          ))}
+                      </dl>
+                      {payment.bankInstructions && (
+                        <p className="text-xs font-light text-foreground/70 mt-4 leading-relaxed">
+                          {payment.bankInstructions}
+                        </p>
+                      )}
+                    </div>
+
+                    <div>
+                      <label
+                        htmlFor="paymentReference"
+                        className="block text-sm font-light text-foreground mb-2 tracking-wide"
+                      >
+                        Transaction ID / Reference (optional)
+                      </label>
+                      <input
+                        id="paymentReference"
+                        type="text"
+                        value={paymentReference}
+                        onChange={(e) => setPaymentReference(e.target.value)}
+                        className="w-full px-5 py-3 rounded-xl bg-gradient-to-r from-primary/5 to-transparent border-2 transition-all duration-300 border-primary/20 focus:border-primary/60 text-foreground font-light focus:outline-none focus:ring-2 focus:ring-primary/20"
+                        placeholder="e.g. TXN123456789"
+                      />
+                    </div>
+
+                    <div>
+                      <label
+                        htmlFor="paymentProof"
+                        className="block text-sm font-light text-foreground mb-2 tracking-wide"
+                      >
+                        Payment Screenshot
+                        {payment.requireProof && <span className="text-primary"> *</span>}
+                      </label>
+                      <input
+                        id="paymentProof"
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => {
+                          handleProofFile(e.target.files?.[0])
+                          e.target.value = ''
+                        }}
+                        disabled={uploadingProof}
+                        aria-describedby="paymentProofHint"
+                        className="w-full px-5 py-3 rounded-xl bg-gradient-to-r from-primary/5 to-transparent border-2 border-primary/20 text-foreground font-light text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:bg-primary file:text-primary-foreground file:font-light file:cursor-pointer disabled:opacity-50"
+                      />
+                      <p id="paymentProofHint" className="text-xs font-light text-foreground/60 mt-2">
+                        JPG or PNG up to 10MB.
+                      </p>
+
+                      {uploadingProof && (
+                        <p className="text-sm font-light text-foreground/70 mt-3 flex items-center gap-2">
+                          <span className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                          Uploading screenshot...
+                        </p>
+                      )}
+
+                      {paymentProof && !uploadingProof && (
+                        <div className="mt-3 flex items-center gap-4">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={paymentProof}
+                            alt="Your payment screenshot"
+                            className="h-20 w-20 rounded-xl border border-primary/20 object-cover"
+                          />
+                          <div className="flex flex-col gap-1">
+                            <span className="text-sm font-light text-primary flex items-center gap-1">
+                              <Check className="w-4 h-4" />
+                              Screenshot attached
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => setPaymentProof('')}
+                              className="text-xs font-light text-foreground/60 hover:text-destructive transition-colors text-left cursor-pointer"
+                            >
+                              Remove
+                            </button>
+                          </div>
+                        </div>
+                      )}
+
+                      {errors.paymentProof && (
+                        <p className="text-sm font-light text-destructive mt-2">
+                          {errors.paymentProof}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
 
               {errors.submit && (
@@ -435,12 +686,12 @@ export function CheckoutClient({ shippingCost = 200 }: { shippingCost?: number }
                 <div className="flex justify-between items-center">
                   <span className="font-light text-foreground/70 text-sm">Shipping</span>
                   <span className="font-light text-foreground">
-                    Rs. {shipping.toLocaleString()}
+                    {shipping === 0 ? (
+                      <span className="text-primary">Free</span>
+                    ) : (
+                      `Rs. ${shipping.toLocaleString()}`
+                    )}
                   </span>
-                </div>
-                <div className="flex justify-between items-center pt-3 border-t border-primary/10">
-                  <span className="font-light text-foreground">Discount</span>
-                  <span className="font-light text-primary">-Rs. 0</span>
                 </div>
               </div>
 
@@ -455,7 +706,9 @@ export function CheckoutClient({ shippingCost = 200 }: { shippingCost?: number }
               {/* Info Box */}
               <div className="p-4 rounded-2xl bg-primary/5 border border-primary/10">
                 <p className="text-xs font-light text-foreground/70 text-center">
-                  Your order will be confirmed after payment upon delivery.
+                  {paymentMethod === 'bank'
+                    ? 'We will verify your transfer and confirm your order on WhatsApp.'
+                    : 'Your order will be confirmed after payment upon delivery.'}
                 </p>
               </div>
             </div>
