@@ -1,8 +1,10 @@
 import type { Metadata } from 'next'
+import { Suspense } from 'react'
 import { Geist, Geist_Mono } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { CartProvider } from '@/context/CartContext'
 import WhatsAppButton from '../components/whatsapp-button'
+import MetaPixel from '@/components/meta-pixel'
 import { getSettings } from '@/lib/data'
 import './globals.css'
 
@@ -37,6 +39,9 @@ export default async function RootLayout({
           {children}
           <WhatsAppButton phoneNumber={settings.whatsapp.phoneNumber} />
         </CartProvider>
+        <Suspense fallback={null}>
+          <MetaPixel />
+        </Suspense>
         <Analytics />
       </body>
     </html>
